@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<array name="shopping_list_items_ids">
+    <item>tt0052357</item>
+    <item>tt0063522</item>
+    <item>tt0072271</item>
+    <item>tt0074285</item>
+    <item>tt0081455</item>
+    <item>tt0086541</item>
+    <item>tt0096283</item>
+    <item>tt0117571</item>
+    <item>tt0166924</item>
+    <item>tt0266697</item>
+    <item>tt0477348</item>
+    <item>tt0816692</item>
+
+</array>
+    <array name="shopping_list_items_names">
+        <item>Sabonete</item>
+        <item>Leite</item>
+        <item>Pão</item>
+        <item>Cereais</item>
+        <item>Jantar</item>
+        <item>Detergente Loiça</item>
+        <item>Detergente Roupa</item>
+        <item>Água Ferro</item>
+        <item>Massa</item>
+        <item>Arroz</item>
+        <item>Mel</item>
+        <item>Cebolas</item>
+
+    </array>
+</resources>
