@@ -14,15 +14,15 @@ public class ShoppingListDBContract {
     public static final int DATABASE_VERSION = 1;
 
     public static final String VAR_CHAR_TYPE = " varchar";
-    public static final String TEXT_TYPE = " text";
+    public static final String INT_CHAR_TYPE = " int";
 
     public static final String COMMA_SEP = ",";
 
     private static final String SQL_CREATE_MOVIE_TABLE =
-            "CREATE TABLE IF NOT EXISTS "+ItemEntry.TABLE_NAME+" ("+
-                    ItemEntry.COLUMN_NAME_ITEM_ID+VAR_CHAR_TYPE
+            "CREATE TABLE IF NOT EXISTS "+ ItemEntry.TABLE_NAME+" ("+
+                    ItemEntry.COLUMN_NAME_ITEM_NAME+VAR_CHAR_TYPE
                     +" PRIMARY KEY"+COMMA_SEP+
-                    ItemEntry.COLUMN_NAME_ITEM_NAME+TEXT_TYPE+" )";
+                    ItemEntry.COLUMN_NAME_ITEM_CHECKED+INT_CHAR_TYPE+" )";
 
 
     public static SQLiteDatabase getWritableDatabase(Context context){
@@ -36,8 +36,8 @@ public class ShoppingListDBContract {
     public static abstract class ItemEntry implements BaseColumns {
 
         public static final String TABLE_NAME = "shopping_list";
-        public static final String COLUMN_NAME_ITEM_ID = "item_id";
         public static final String COLUMN_NAME_ITEM_NAME = "item_name";
+        public static final String COLUMN_NAME_ITEM_CHECKED = "item_checked";
 
     }
 

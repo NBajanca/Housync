@@ -12,15 +12,15 @@ public class ShoppingListCursor extends CursorWrapper {
         super(cursor);
     }
 
-    public String getId(){
-        return getString(
-                getColumnIndex(ShoppingListDBContract.
-                        ItemEntry.COLUMN_NAME_ITEM_ID));
-    }
-
     public String getName(){
         return getString(
                 getColumnIndex(ShoppingListDBContract.
                         ItemEntry.COLUMN_NAME_ITEM_NAME));
+    }
+
+    public int getChecked(){
+        return getInt(
+                getColumnIndex(ShoppingListDBContract.
+                        ItemEntry.COLUMN_NAME_ITEM_CHECKED));
     }
 }

@@ -1,11 +1,9 @@
 package nunobajanca.housync.activities;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,11 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 
 import nunobajanca.housync.R;
-import nunobajanca.housync.fragments.HomeFragment;
-import nunobajanca.housync.fragments.ShoppingListFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -48,10 +43,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //Use main Fragmeng
-        setItemSelected(R.id.nav_home);
-        navigationView.getMenu().getItem(0).setChecked(true);
     }
 
     @Override
@@ -86,32 +77,37 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Intent newActivityIntent = null;
 
-        setItemSelected(id);
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
+        } else if (id == R.id.nav_slideshow) {
 
-    private boolean setItemSelected(int id) {
-        Fragment fragment;
+        } else if (id == R.id.nav_manage) {
 
-        switch (id) {
-            case R.id.nav_shopping:
-                fragment = new ShoppingListFragment();
-                break;
-            default:
-                fragment = new HomeFragment();
-                break;
+        } else if (id == R.id.nav_shopping_list) {
+            newActivityIntent = new Intent(MainActivity.this, ShoppingListActivity.class);
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
         }
 
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        if (newActivityIntent != null){
+            startActivity(newActivityIntent);
+        }else{
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+        }
+
 
         return true;
     }

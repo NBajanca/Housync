@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import nunobajanca.housync.R;
 import nunobajanca.housync.data.ShoppingListCursor;
@@ -40,17 +38,16 @@ public class ShoppingListService {
     public List<ShoppingListItem> getAllItems() {
 
         ShoppingListCursor cursor = repository.findAll();
-
         final int count = cursor.getCount();
 
         final List<ShoppingListItem> ShoppingList = new ArrayList<ShoppingListItem>();
 
         while (cursor.moveToNext()) {
 
-            String ItemId = cursor.getId();
             String ItemName = cursor.getName();
+            Boolean ItemChecked = (cursor.getChecked() == 1)? true : false ;
 
-            ShoppingListItem item = new ShoppingListItem(ItemId,ItemName);
+            ShoppingListItem item = new ShoppingListItem(ItemName, ItemChecked);
             ShoppingList.add(item);
             if (ShoppingList.size() == count)
                 break;
@@ -62,25 +59,19 @@ public class ShoppingListService {
 
     private void fillWithDefault(Context context){
         if(repository.findAll().getCount() == 0){
-            TypedArray ItemsIds = context.getResources()
-                    .obtainTypedArray(R.array.shopping_list_items_ids);
             TypedArray ItemsNames = context.getResources()
-                    .obtainTypedArray(R.array.shopping_list_items_names);
+                    .obtainTypedArray(R.array.default_shopping_list_items_names);
 
-            for(int i = 0; i < ItemsIds.length(); i++){
+            for(int i = 0; i < ItemsNames.length(); i++){
                 repository.add(
-                        new ShoppingListItem(ItemsIds.getString(i),
-                                ItemsNames.getString(i)));
+                        new ShoppingListItem(ItemsNames.getString(i)));
             }
         }
     }
 
+    public void add(ShoppingListItem item){ repository.add(item);}
 
-    public void add(ShoppingListItem item){
-        repository.add(item);
-    }
+    public void delete(ShoppingListItem item){ repository.delete(item);}
 
-    public void delete(ShoppingListItem item){
-        repository.delete(item);
-    }
+    public void updateChecked(ShoppingListItem item) { repository.updateChecked(item);}
 }

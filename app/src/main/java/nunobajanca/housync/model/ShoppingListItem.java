@@ -1,22 +1,29 @@
 package nunobajanca.housync.model;
 
+import android.annotation.TargetApi;
+import android.os.Build;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import static java.util.Objects.equals;
 
 /**
- * Created by Nuno on 26/12/2015.
+ * Created by Nuno on 06/01/2016.
  */
 public class ShoppingListItem {
-
-
     private String name;
-    private String id;
+    private boolean checked;
 
-    public ShoppingListItem(){}
+    public ShoppingListItem(String itemName, Boolean itemChecked) {
+        this.name = itemName;
+        this.checked = itemChecked;
+    }
 
-    public ShoppingListItem(String name, String id){
-        this.name = name;
-        this.id = id;
+    public ShoppingListItem(String itemName){
+        this.name = itemName;
+        this.checked = false;
     }
 
     public String getName() {
@@ -27,19 +34,20 @@ public class ShoppingListItem {
         this.name = name;
     }
 
-    public String getId() {
-        return id;
+    public boolean getChecked() {
+        return checked;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public boolean equals(Object object){
         if(object instanceof ShoppingListItem){
             ShoppingListItem item = (ShoppingListItem)object;
-            return this.getId().equals(item.getId());
+            return Objects.equals(this.getName(),item.getName());
         }
         return false;
     }
@@ -47,11 +55,46 @@ public class ShoppingListItem {
     public static List<ShoppingListItem> ShoppingList(){
 
         List<ShoppingListItem> ShoppingList = new ArrayList<>();
-        ShoppingList.add(new ShoppingListItem("Detergente Roupa", "detergente_roupa"));
-        ShoppingList.add(new ShoppingListItem("Detergente Loiça", "detergente_loica"));
-        ShoppingList.add(new ShoppingListItem("Leite", "leite"));
-        ShoppingList.add(new ShoppingListItem("Jantar", "jantar"));
-        ShoppingList.add(new ShoppingListItem("Almoço", "almoco"));
+        ShoppingList.add(new ShoppingListItem("Detergente Roupa"));
+        ShoppingList.add(new ShoppingListItem("Detergente Loiça"));
+        ShoppingList.add(new ShoppingListItem("Leite"));
+        ShoppingList.add(new ShoppingListItem("Jantar"));
+        ShoppingList.add(new ShoppingListItem("Almoço"));
+        ShoppingList.add(new ShoppingListItem("Detergente Roupa"));
+        ShoppingList.add(new ShoppingListItem("Detergente Loiça"));
+        ShoppingList.add(new ShoppingListItem("Leite"));
+        ShoppingList.add(new ShoppingListItem("Jantar"));
+        ShoppingList.add(new ShoppingListItem("Almoço"));
+        ShoppingList.add(new ShoppingListItem("Detergente Roupa"));
+        ShoppingList.add(new ShoppingListItem("Detergente Loiça"));
+        ShoppingList.add(new ShoppingListItem("Leite"));
+        ShoppingList.add(new ShoppingListItem("Jantar"));
+        ShoppingList.add(new ShoppingListItem("Almoço"));
+        ShoppingList.add(new ShoppingListItem("Detergente Roupa"));
+        ShoppingList.add(new ShoppingListItem("Detergente Loiça"));
+        ShoppingList.add(new ShoppingListItem("Leite"));
+        ShoppingList.add(new ShoppingListItem("Jantar"));
+        ShoppingList.add(new ShoppingListItem("Almoço"));
+        ShoppingList.add(new ShoppingListItem("Detergente Roupa"));
+        ShoppingList.add(new ShoppingListItem("Detergente Loiça vamos experimentar uma coisa gigante para ver se muda de linha ou se fica tudo na mesma"));
+        ShoppingList.add(new ShoppingListItem("Leite"));
+        ShoppingList.add(new ShoppingListItem("Jantar"));
+        ShoppingList.add(new ShoppingListItem("Almoço"));
+        ShoppingList.add(new ShoppingListItem("Detergente Roupa"));
+        ShoppingList.add(new ShoppingListItem("Detergente Loiça"));
+        ShoppingList.add(new ShoppingListItem("Leite"));
+        ShoppingList.add(new ShoppingListItem("Jantar"));
+        ShoppingList.add(new ShoppingListItem("Almoço"));
+        ShoppingList.add(new ShoppingListItem("Detergente Roupa"));
+        ShoppingList.add(new ShoppingListItem("Detergente Loiça"));
+        ShoppingList.add(new ShoppingListItem("Leite"));
+        ShoppingList.add(new ShoppingListItem("Jantar"));
+        ShoppingList.add(new ShoppingListItem("Almoço"));
+        ShoppingList.add(new ShoppingListItem("Detergente Roupa"));
+        ShoppingList.add(new ShoppingListItem("Detergente Loiça"));
+        ShoppingList.add(new ShoppingListItem("Leite"));
+        ShoppingList.add(new ShoppingListItem("Jantar"));
+        ShoppingList.add(new ShoppingListItem("Almoço"));
 
         return ShoppingList;
 
