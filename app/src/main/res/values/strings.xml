@@ -1,13 +1,37 @@
 <resources>
-    <string name="app_name">Housync - Shared House Manager</string>
+    <string name="app_name">HouSync</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="title_activity_shopping_list">Shopping List</string>
-    <string name="shopping_list_item_checked">is in the cart</string>
-    <string name="shopping_list_item_unchecked">isn\'t on the cart</string>
-    <string name="title_activity_add_item_shopping_list_activitie">Add an Item</string>
-    <string name="shopping_list_item_added">added to the Shopping List</string>
+    <string name="loading">Loading…</string>
+
+    <string name="title_activity_log_in">Log In</string>
+
+    <!-- Sign-in Activity -->
+    <string name="signed_in_fmt">Signed in as: %s</string>
+    <string name="signed_in">Signed in</string>
+    <string name="signing_in">Signing in…</string>
+    <string name="signed_out">Signed out</string>
+
+    <!-- Google Play Services error for Toast -->
+    <string name="play_services_error_fmt">Google Play Services Error: %i</string>
+
+    <!-- Button labels -->
+    <string name="sign_out">Sign Out</string>
+    <string name="disconnect">Disconnect</string>
+
+    <!-- Log In Activity titles -->
+    <string name="title_google_login">Google Account</string>
+    <string name="title_facebook_login">Facebook Account</string>
+
+    <!-- Content Description for images -->
+    <string name="desc_google_icon">Google Logo</string>
+    <string name="desc_facebook_icon">Facebook Logo</string>
+
+
+    <!-- Rationale for asking for Contacts -->
+    <string name="contacts_permission_rationale">Contacts access is needed in order to retrieve your email address.</string>
+
 </resources>
