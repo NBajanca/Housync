@@ -14,9 +14,14 @@
     <string name="signed_in">Signed in</string>
     <string name="signing_in">Signing in…</string>
     <string name="signed_out">Signed out</string>
+    <string name="signing_in_canceled">Login attempt canceled</string>
+    <string name="signing_in_error">Login attempt failed</string>
 
     <!-- Google Play Services error for Toast -->
     <string name="play_services_error_fmt">Google Play Services Error: %i</string>
+
+    <!-- Facebook App ID -->
+    <string name="facebook_app_id">1037666926296034</string>
 
     <!-- Button labels -->
     <string name="sign_out">Sign Out</string>
