@@ -1,48 +1,32 @@
 package pt.nb_web.housync.Activities;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
-import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
+import com.example.nuno.myapplication.housync_backend.myApi.model.HouSyncUser;
 import com.facebook.FacebookSdk;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import pt.nb_web.housync.R;
+import pt.nb_web.housync.SignInServices.FacebookAccount;
+import pt.nb_web.housync.SignInServices.GoogleAccount;
+import pt.nb_web.housync.SignInServices.LogInAsyncTask;
+import pt.nb_web.housync.SignInServices.SignInAccount;
+import pt.nb_web.housync.SignInServices.UserLogIn;
 
-public class LogInActivity extends AppCompatActivity/* implements
-        GoogleApiClient.OnConnectionFailedListener,
-        View.OnClickListener*/{
-
-    private static final String TAG = "LogInActivity";
+public class LogInActivity extends AppCompatActivity{
 
     private GoogleAccount googleAccount;
-
-    private TextView mStatusFacebookTextView;
-
-    LoginButton loginButton;
-    CallbackManager callbackManager;
-    AccessTokenTracker accessTokenTracker;
+    private FacebookAccount facebookAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,58 +41,31 @@ public class LogInActivity extends AppCompatActivity/* implements
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         googleAccount = new GoogleAccount(this);
-        googleAccount.onCreateLogInActivity();
+        facebookAccount = new FacebookAccount(this);
 
-        // Views
-        mStatusFacebookTextView = (TextView) findViewById(R.id.facebook_status);
-
-
-        //Facebook buttons
-        loginButton = (LoginButton) findViewById(R.id.facebook_sign_in_button);
-        loginButton.setReadPermissions("user_friends");
-
-        callbackManager = CallbackManager.Factory.create();
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                    handleFacebookSignInResult();
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(
+                    "pt.nb_web.housync",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
+        } catch (PackageManager.NameNotFoundException e) {
 
-            @Override
-            public void onCancel() {
-                mStatusFacebookTextView.setText(R.string.signing_in_canceled);
-            }
+        } catch (NoSuchAlgorithmException e) {
 
-            @Override
-            public void onError(FacebookException exception) {
-                mStatusFacebookTextView.setText(R.string.signing_in_error);
-            }
-        });
-
-        accessTokenTracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(
-                    AccessToken oldAccessToken,
-                    AccessToken currentAccessToken) {
-                    if (currentAccessToken == null){
-                        mStatusFacebookTextView.setText(R.string.signed_out);
-                    }
-                // Set the access token using
-                // currentAccessToken when it's loaded or set.
-            }
-        };
+        }
     }
 
 
     public void onStart() {
         super.onStart();
-        googleAccount.onStart();
 
-        // If the access token is available already assign it.
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (accessToken != null){
-            handleFacebookSignInResult();
-        }
+        googleAccount.onStart();
+        facebookAccount.onStart();
+        updateLoginState();
     }
 
     @Override
@@ -116,23 +73,39 @@ public class LogInActivity extends AppCompatActivity/* implements
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == googleAccount.getRcSignIn()) {
-            googleAccount.onLogInActivityResult(data);
+            googleAccount.onLogInActivityResult(requestCode, resultCode, data);
+            new LogInAsyncTask(this).execute((SignInAccount) googleAccount);
         }else{
-            callbackManager.onActivityResult(requestCode, resultCode, data);
+            facebookAccount.onLogInActivityResult(requestCode, resultCode, data);
+            new LogInAsyncTask(this).execute((SignInAccount) facebookAccount);
         }
+    }
+
+    public void onStop(){
+        super.onStop();
+        updateLoginState();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        accessTokenTracker.stopTracking();
+        facebookAccount.onDestroy();
     }
 
-    private void handleFacebookSignInResult() {
-        Log.d(TAG, "handleFacebookSignInResult: success");
-        // Signed in successfully, show authenticated UI.
-        //ToDo: Receive login information
-        mStatusFacebookTextView.setText(getString(R.string.signed_in_fmt, AccessToken.getCurrentAccessToken().getUserId()));
+    private void updateLoginState(){
+        UserLogIn userLogIn = new UserLogIn(this);
+
+        if(userLogIn.checkIfLogedIn()){
+            if((googleAccount.getGoogleSignInAccount() == null) && (facebookAccount.getAccessToken() == null)){
+                userLogIn.clearUser();
+            }
+        }else{
+            if(googleAccount.getGoogleSignInAccount() != null){
+                new LogInAsyncTask(this).execute((SignInAccount) googleAccount);
+            }else if(facebookAccount.getAccessToken() != null) {
+                new LogInAsyncTask(this).execute((SignInAccount) facebookAccount);
+            }
+        }
     }
 
 }

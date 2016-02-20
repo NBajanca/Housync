@@ -9,6 +9,12 @@
 
     <string name="title_activity_log_in">Log In</string>
 
+
+
+    <string name="user_file_key">pt.nb_web.housync.user_file_key</string>
+    <string name="houSyncUserId">user_id</string>
+    <string name="houSyncUserName">user_name</string>
+
     <!-- Sign-in Activity -->
     <string name="signed_in_fmt">Signed in as: %s</string>
     <string name="signed_in">Signed in</string>
@@ -38,6 +44,7 @@
 
     <!-- Rationale for asking for Contacts -->
     <string name="contacts_permission_rationale">Contacts access is needed in order to retrieve your email address.</string>
+
     <string name="manage_sign_in">Manage SignIn</string>
     <string name="no_login">Not Loged In</string>
 

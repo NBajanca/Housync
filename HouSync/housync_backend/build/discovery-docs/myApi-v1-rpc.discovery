@@ -1,6 +1,6 @@
 {
  "kind": "discovery#rpcDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/BAhmzWnjsMTH1HjvccHKaPx8C0Q\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/akgmLfensSysq-mNNKglOuQ0uY4\"",
  "discoveryVersion": "v1",
  "id": "myApi:v1",
  "name": "myApi",
@@ -66,47 +66,72 @@
    "scopes": {
     "https://www.googleapis.com/auth/userinfo.email": {
      "description": "View your email address"
-    },
-    "https://www.googleapis.com/auth/userinfo.profile": {
-     "description": "View your basic profile info"
     }
    }
   }
  },
  "schemas": {
-  "MyBean": {
-   "id": "MyBean",
+  "HouSyncUser": {
+   "id": "HouSyncUser",
    "type": "object",
    "properties": {
-    "data": {
+    "email": {
+     "type": "string"
+    },
+    "errorCode": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "userId": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "userName": {
      "type": "string"
     }
    }
   }
  },
  "methods": {
-  "myApi.sayHi": {
-   "id": "myApi.sayHi",
-   "returns": {
-    "$ref": "MyBean"
-   },
-   "scopes": [
-    "https://www.googleapis.com/auth/userinfo.profile"
-   ]
-  },
-  "myApi.sayHitoName": {
-   "id": "myApi.sayHitoName",
+  "myApi.signInFacebook": {
+   "id": "myApi.signInFacebook",
    "parameters": {
-    "name": {
+    "facebookUserId": {
      "type": "string",
      "required": true
+    },
+    "resource": {
+     "$ref": "HouSyncUser"
     }
    },
    "parameterOrder": [
-    "name"
+    "resource",
+    "facebookUserId"
    ],
    "returns": {
-    "$ref": "MyBean"
+    "$ref": "HouSyncUser"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "myApi.signInGoogle": {
+   "id": "myApi.signInGoogle",
+   "parameters": {
+    "googleUserId": {
+     "type": "string",
+     "required": true
+    },
+    "resource": {
+     "$ref": "HouSyncUser"
+    }
+   },
+   "parameterOrder": [
+    "resource",
+    "googleUserId"
+   ],
+   "returns": {
+    "$ref": "HouSyncUser"
    },
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"
