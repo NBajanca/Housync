@@ -24,15 +24,23 @@ import pt.nb_web.housync.EndpointsAsyncTask;
 import pt.nb_web.housync.R;
 
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
 
+
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
+
+    private static final int NAV_HEADER = 0;
     private GoogleAccount googleAccount;
+
+    private View headerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -56,12 +64,15 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        headerView = navigationView.getHeaderView(NAV_HEADER);
+        headerView.findViewById(R.id.sign_in_activity_button).setOnClickListener(this);
+
         /*new EndpointsAsyncTask().execute(new Pair<Context, String>(this, "Manfred"));*/
     }
 
     public void onStart() {
         super.onStart();
-        new LogInAsyncTask(this).execute(googleAccount);
+        new LogInAsyncTask(this).execute(googleAccount, headerView);
     }
 
     @Override
@@ -119,8 +130,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            Intent intent = new Intent(this, LogInActivity.class);
-            startActivity(intent);
+
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -139,4 +149,14 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.sign_in_activity_button:
+                Intent intent = new Intent(this, LogInActivity.class);
+                startActivity(intent);
+                break;
+        }
+
+    }
 }
