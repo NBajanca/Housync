@@ -1,6 +1,19 @@
 <resources>
     <string name="app_name">HouSync</string>
 
+    <!-- Menu -->
+    <string name="main_activity_menu">Home</string>
+    <string name="house_manager_activity_menu">House Manager</string>
+    <string name="notes_activity_menu">Notes</string>
+    <string name="shopping_list_activity_menu">Shopping List</string>
+
+    <!-- House Manager -->
+    <string name="title_activity_house_manager">House Manager</string>
+
+    <!-- House Details -->
+    <string name="title_activity_house_details">House Details</string>
+
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -8,7 +21,6 @@
     <string name="loading">Loading…</string>
 
     <string name="title_activity_log_in">Log In</string>
-
 
 
     <string name="user_file_key">pt.nb_web.housync.user_file_key</string>
@@ -47,5 +59,9 @@
 
     <string name="manage_sign_in">Manage SignIn</string>
     <string name="no_login">Not Loged In</string>
+    <string name="last_sync">Last sync: </string>
+    <string name="never_sync">Never</string>
+    <string name="sync">Sync</string>
+
 
 </resources>

@@ -19,6 +19,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -33,15 +35,21 @@ import javax.inject.Named;
     )
 )
 public class MyEndpoint {
+    private final static int USER_DB = 1;
+    private final static int HOUSE_DB = 2;
+
     /**Method to process google Sign In) */
     @ApiMethod(name = "signInGoogle")
     public HouSyncUser signInGoogle(@Named("googleUserId") String googleUserId, HouSyncUser user) {
         HouSyncUser response = new HouSyncUser();
 
-        String url = getDBUrl();
+        String url = null;
         StringWriter error = new StringWriter();
 
-        if (url == null){
+        try {
+            url = getDBUrl(USER_DB);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
             response.setErrorCode(-1);
             return response;
         }
@@ -133,10 +141,13 @@ public class MyEndpoint {
     public HouSyncUser signInFacebook(@Named("facebookUserId") String facebookUserId, HouSyncUser user) {
         HouSyncUser response = new HouSyncUser();
 
-        String url = getDBUrl();
+        String url = null;
         StringWriter error = new StringWriter();
 
-        if (url == null){
+        try {
+            url = getDBUrl(USER_DB);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
             response.setErrorCode(-1);
             return response;
         }
@@ -222,16 +233,126 @@ public class MyEndpoint {
         return response;
     }
 
-    private String getDBUrl() {
-        String url;
+
+    @ApiMethod(name = "createHouse")
+    public HouSyncHouse createHouse(HouSyncHouse house){
+
+        String url = null;
+        StringWriter error = new StringWriter();
+
         try {
-            // Load the class that provides the new "jdbc:google:mysql://" prefix.
-            Class.forName("com.mysql.jdbc.GoogleDriver");
-            url = "jdbc:google:mysql://housync-android:housync-db/housync_user?user=root";
-        } catch (Exception e) {
+            url = getDBUrl(HOUSE_DB);
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            return null;
+            house.setErrorCode(-1);
+            return house;
         }
+
+        try {
+            Connection connection = DriverManager.getConnection(url);
+            try {
+                String statement = "INSERT INTO house (name, id_admin) " +
+                        "VALUES (?, ?);";
+                PreparedStatement stmt = connection.prepareStatement(statement);
+                stmt.setString(1, house.getHouseName());
+                stmt.setInt(2, house.getAdminId());
+                stmt.execute();
+
+                statement = "SELECT id FROM house " +
+                        "WHERE id_admin = ? " +
+                        "ORDER BY create_time DESC;";
+                stmt = connection.prepareStatement(statement);
+                stmt.setInt(1, house.getAdminId());
+                ResultSet resultSet = stmt.executeQuery();
+
+                resultSet.first();
+                int houseId = resultSet.getInt("id");
+                house.setHouseId(houseId);
+
+                statement = "INSERT INTO user_house (id_user, id_house) " +
+                        "VALUES (?, ?);";
+                stmt = connection.prepareStatement(statement);
+                stmt.setInt(1, house.getAdminId());
+                stmt.setInt(2, house.getHouseId());
+                stmt.execute();
+
+            }finally {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(new PrintWriter(error));
+            house.setHouseName(error.toString());
+            house.setErrorCode(-2);
+        }
+
+        return house;
+    }
+
+    public List<HouSyncHouse> getAllHouses(@Named("userId") int houSyncUserId){
+        List<HouSyncHouse> houSyncHouses = new ArrayList<HouSyncHouse>();
+
+        String url = null;
+        StringWriter error = new StringWriter();
+
+        try {
+            url = getDBUrl(HOUSE_DB);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            HouSyncHouse house = new HouSyncHouse();
+            house.setErrorCode(-1);
+            houSyncHouses.clear();
+            houSyncHouses.add(house);
+            return houSyncHouses;
+        }
+
+        try {
+            Connection connection = DriverManager.getConnection(url);
+            try {
+                String statement = "SELECT * " +
+                        "FROM house inner join user_house " +
+                        "WHERE id = id_house " +
+                        "AND id_user = ?";
+                PreparedStatement stmt = connection.prepareStatement(statement);
+                stmt.setInt(1, houSyncUserId);
+                ResultSet resultSet = stmt.executeQuery();
+
+                while (resultSet.next()){
+                    int houseId = resultSet.getInt("id");
+                    String houseName = resultSet.getString("name");
+                    int adminId = resultSet.getInt("id_admin");
+                    HouSyncHouse house = new HouSyncHouse(houseId, houseName, adminId);
+                    houSyncHouses.add(house);
+                }
+
+            }finally {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(new PrintWriter(error));
+            HouSyncHouse house = new HouSyncHouse();
+            house.setHouseName(error.toString());
+            house.setErrorCode(-2);
+            houSyncHouses.clear();
+            houSyncHouses.add(house);
+        }
+
+        return houSyncHouses;
+
+    }
+
+    private String getDBUrl(int db) throws ClassNotFoundException {
+        String url = null;
+
+        Class.forName("com.mysql.jdbc.GoogleDriver");
+        switch (db){
+            case (USER_DB):
+                url = "jdbc:google:mysql://housync-android:housync-db/housync_user?user=root";
+                break;
+            case (HOUSE_DB):
+                url = "jdbc:google:mysql://housync-android:housync-db/housync_house?user=root";
+                break;
+        }
+
         return url;
     }
     

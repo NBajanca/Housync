@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/akgmLfensSysq-mNNKglOuQ0uY4\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/R0z2jLh4iJVefoLqh0Hb3K_ajeI\"",
  "discoveryVersion": "v1",
  "id": "myApi:v1",
  "name": "myApi",
@@ -73,6 +73,42 @@
   }
  },
  "schemas": {
+  "HouSyncHouse": {
+   "id": "HouSyncHouse",
+   "type": "object",
+   "properties": {
+    "adminId": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "errorCode": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "houseId": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "houseName": {
+     "type": "string"
+    },
+    "snapShot": {
+     "type": "string"
+    }
+   }
+  },
+  "HouSyncHouseCollection": {
+   "id": "HouSyncHouseCollection",
+   "type": "object",
+   "properties": {
+    "items": {
+     "type": "array",
+     "items": {
+      "$ref": "HouSyncHouse"
+     }
+    }
+   }
+  },
   "HouSyncUser": {
    "id": "HouSyncUser",
    "type": "object",
@@ -95,6 +131,21 @@
   }
  },
  "methods": {
+  "createHouse": {
+   "id": "myApi.createHouse",
+   "path": "createHouse",
+   "httpMethod": "POST",
+   "request": {
+    "$ref": "HouSyncHouse",
+    "parameterName": "resource"
+   },
+   "response": {
+    "$ref": "HouSyncHouse"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
   "signInFacebook": {
    "id": "myApi.signInFacebook",
    "path": "signInFacebook/{facebookUserId}",
@@ -144,6 +195,34 @@
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"
    ]
+  }
+ },
+ "resources": {
+  "myEndpoint": {
+   "methods": {
+    "getAllHouses": {
+     "id": "myApi.myEndpoint.getAllHouses",
+     "path": "housynchousecollection/{userId}",
+     "httpMethod": "GET",
+     "parameters": {
+      "userId": {
+       "type": "integer",
+       "required": true,
+       "format": "int32",
+       "location": "path"
+      }
+     },
+     "parameterOrder": [
+      "userId"
+     ],
+     "response": {
+      "$ref": "HouSyncHouseCollection"
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email"
+     ]
+    }
+   }
   }
  }
 }

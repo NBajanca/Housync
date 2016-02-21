@@ -1,27 +1,18 @@
-package pt.nb_web.housync.Activities;
+package pt.nb_web.housync.activities;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
-import android.util.Log;
 
-import com.example.nuno.myapplication.housync_backend.myApi.model.HouSyncUser;
 import com.facebook.FacebookSdk;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import pt.nb_web.housync.R;
-import pt.nb_web.housync.SignInServices.FacebookAccount;
-import pt.nb_web.housync.SignInServices.GoogleAccount;
-import pt.nb_web.housync.SignInServices.LogInAsyncTask;
-import pt.nb_web.housync.SignInServices.SignInAccount;
-import pt.nb_web.housync.SignInServices.UserLogIn;
+import pt.nb_web.housync.service.sign_in.FacebookAccount;
+import pt.nb_web.housync.service.sign_in.GoogleAccount;
+import pt.nb_web.housync.service.sign_in.LogInAsyncTask;
+import pt.nb_web.housync.service.sign_in.SignInAccount;
+import pt.nb_web.housync.service.sign_in.UserLogIn;
 
 public class LogInActivity extends AppCompatActivity{
 
@@ -42,21 +33,6 @@ public class LogInActivity extends AppCompatActivity{
 
         googleAccount = new GoogleAccount(this);
         facebookAccount = new FacebookAccount(this);
-
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    "pt.nb_web.housync",
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-
-        } catch (NoSuchAlgorithmException e) {
-
-        }
     }
 
 
