@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_main"
+            android:icon="@drawable/ic_action_home"
+            android:title="@string/main_activity_menu" />
+        <item
+            android:id="@+id/nav_house_manager"
+            android:icon="@drawable/ic_home"
+            android:title="@string/house_manager_activity_menu" />
+        <item
+            android:id="@+id/nav_notes"
+            android:icon="@drawable/ic_my_library_books"
+            android:title="@string/notes_activity_menu" />
+        <item
+            android:id="@+id/nav_shopping_list"
+            android:icon="@drawable/ic_shopping_cart"
+            android:title="@string/shopping_list_activity_menu" />
+    </group>
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>
+
+</menu>

@@ -1,0 +1,214 @@
+{
+ "kind": "discovery#rpcDescription",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/R0z2jLh4iJVefoLqh0Hb3K_ajeI\"",
+ "discoveryVersion": "v1",
+ "id": "myApi:v1",
+ "name": "myApi",
+ "version": "v1",
+ "description": "This is an API",
+ "ownerDomain": "housync_backend.myapplication.Nuno.example.com",
+ "ownerName": "housync_backend.myapplication.Nuno.example.com",
+ "icons": {
+  "x16": "http://www.google.com/images/icons/product/search-16.gif",
+  "x32": "http://www.google.com/images/icons/product/search-32.gif"
+ },
+ "protocol": "rpc",
+ "rootUrl": "https://myApplicationId.appspot.com/_ah/api/",
+ "rpcUrl": "https://myApplicationId.appspot.com/_ah/api/rpc",
+ "rpcPath": "/_ah/api/rpc",
+ "parameters": {
+  "alt": {
+   "type": "string",
+   "description": "Data format for the response.",
+   "default": "json",
+   "enum": [
+    "json"
+   ],
+   "enumDescriptions": [
+    "Responses with Content-Type of application/json"
+   ],
+   "location": "query"
+  },
+  "fields": {
+   "type": "string",
+   "description": "Selector specifying which fields to include in a partial response.",
+   "location": "query"
+  },
+  "key": {
+   "type": "string",
+   "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+   "location": "query"
+  },
+  "oauth_token": {
+   "type": "string",
+   "description": "OAuth 2.0 token for the current user.",
+   "location": "query"
+  },
+  "prettyPrint": {
+   "type": "boolean",
+   "description": "Returns response with indentations and line breaks.",
+   "default": "true",
+   "location": "query"
+  },
+  "quotaUser": {
+   "type": "string",
+   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "location": "query"
+  },
+  "userIp": {
+   "type": "string",
+   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "location": "query"
+  }
+ },
+ "auth": {
+  "oauth2": {
+   "scopes": {
+    "https://www.googleapis.com/auth/userinfo.email": {
+     "description": "View your email address"
+    }
+   }
+  }
+ },
+ "schemas": {
+  "HouSyncHouse": {
+   "id": "HouSyncHouse",
+   "type": "object",
+   "properties": {
+    "adminId": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "errorCode": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "houseId": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "houseName": {
+     "type": "string"
+    },
+    "snapShot": {
+     "type": "string"
+    }
+   }
+  },
+  "HouSyncHouseCollection": {
+   "id": "HouSyncHouseCollection",
+   "type": "object",
+   "properties": {
+    "items": {
+     "type": "array",
+     "items": {
+      "$ref": "HouSyncHouse"
+     }
+    }
+   }
+  },
+  "HouSyncUser": {
+   "id": "HouSyncUser",
+   "type": "object",
+   "properties": {
+    "email": {
+     "type": "string"
+    },
+    "errorCode": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "userId": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "userName": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "methods": {
+  "myApi.createHouse": {
+   "id": "myApi.createHouse",
+   "parameters": {
+    "resource": {
+     "$ref": "HouSyncHouse"
+    }
+   },
+   "parameterOrder": [
+    "resource"
+   ],
+   "returns": {
+    "$ref": "HouSyncHouse"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "myApi.myEndpoint.getAllHouses": {
+   "id": "myApi.myEndpoint.getAllHouses",
+   "allowGet": true,
+   "parameters": {
+    "userId": {
+     "type": "integer",
+     "required": true,
+     "format": "int32"
+    }
+   },
+   "parameterOrder": [
+    "userId"
+   ],
+   "returns": {
+    "$ref": "HouSyncHouseCollection"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "myApi.signInFacebook": {
+   "id": "myApi.signInFacebook",
+   "parameters": {
+    "facebookUserId": {
+     "type": "string",
+     "required": true
+    },
+    "resource": {
+     "$ref": "HouSyncUser"
+    }
+   },
+   "parameterOrder": [
+    "resource",
+    "facebookUserId"
+   ],
+   "returns": {
+    "$ref": "HouSyncUser"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "myApi.signInGoogle": {
+   "id": "myApi.signInGoogle",
+   "parameters": {
+    "googleUserId": {
+     "type": "string",
+     "required": true
+    },
+    "resource": {
+     "$ref": "HouSyncUser"
+    }
+   },
+   "parameterOrder": [
+    "resource",
+    "googleUserId"
+   ],
+   "returns": {
+    "$ref": "HouSyncUser"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  }
+ }
+}
