@@ -56,6 +56,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.nb_web.housync.activities.HouseManagerActivity" />
         </activity>
+        <activity
+            android:name=".activities.AddHouseActivity"
+            android:label="@string/title_activity_add_house"
+            android:parentActivityName=".activities.HouseManagerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pt.nb_web.housync.activities.HouseManagerActivity" />
+        </activity>
     </application>
 
 </manifest>

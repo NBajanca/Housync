@@ -33,4 +33,20 @@ public class House extends HouSyncHouse {
     public String getLocalIdString() {
         return Integer.toString(getHouseLocalId());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        House house = (House) o;
+
+        return getHouseLocalId() == house.getHouseLocalId();
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getHouseLocalId();
+    }
 }

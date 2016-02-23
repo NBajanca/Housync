@@ -24,8 +24,6 @@ public class HouseService {
     private HouseService(Context context) {
 
         repository = new HouseSQLiteRepository(context);
-
-        fillWithDefault(context);
     }
 
     public static synchronized HouseService getInstance(Context context) {
@@ -53,18 +51,6 @@ public class HouseService {
 
         cursor.close();
         return housesList;
-    }
-
-    private void fillWithDefault(Context context){
-        if(repository.findAll().getCount() == 0){
-            TypedArray ItemsNames = context.getResources()
-                    .obtainTypedArray(R.array.default_houses_list_names);
-
-            for(int i = 0; i < ItemsNames.length(); i++){
-                repository.addNew(
-                        new House(ItemsNames.getString(i), 0));
-            }
-        }
     }
 
     public House getHouse(House item){

@@ -25,8 +25,6 @@ import pt.nb_web.housync.service.HouseService;
  */
 public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdapter.HouseRecyclerViewHolder>{
     private List<House> housesList;
-    private Context context;
-    private HouseRecyclerViewHolder viewHolder;
     private HouseService houseService;
 
     public final static String EXTRA_HOUSE = "pt.nb_web.housync.HOUSE";
@@ -55,7 +53,13 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
     }
 
     public int getItemPosition(House item){
-        return housesList.indexOf(item);
+        for (House house:housesList) {
+            if (house.equals(item)){
+                return housesList.indexOf(house);
+            }
+
+        }
+        return -1;
     }
 
     @Override
@@ -65,7 +69,7 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
 
     @Override
     public HouseRecyclerAdapter.HouseRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context = parent.getContext();
+        Context context = parent.getContext();
         houseService = HouseService.getInstance(context);
 
         View itemView = LayoutInflater
@@ -78,17 +82,7 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
     @Override
     public void onBindViewHolder(HouseRecyclerAdapter.HouseRecyclerViewHolder holder, final int position) {
         House item = getItem(position);
-        viewHolder = holder;
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                House item = getItem(position);
-                Intent intent = new Intent(context, HouseDetailsActivity.class);
-                intent.putExtra(EXTRA_HOUSE, item.getHouseLocalId());
-                context.startActivity(intent);
-            }
-        });
+        RecyclerView.ViewHolder viewHolder = holder;
 
         holder.vName.setText(item.getHouseName());
     }

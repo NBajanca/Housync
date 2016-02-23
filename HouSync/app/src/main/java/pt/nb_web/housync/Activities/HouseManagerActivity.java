@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
 
@@ -23,17 +24,24 @@ import java.util.List;
 
 import pt.nb_web.housync.R;
 import pt.nb_web.housync.adapter.HouseRecyclerAdapter;
+import pt.nb_web.housync.fragments.HouseDetailsActivityFragment;
+import pt.nb_web.housync.fragments.HouseManagerActivityFragment;
 import pt.nb_web.housync.model.House;
 import pt.nb_web.housync.service.HouseService;
+import pt.nb_web.housync.utils.Commons;
 import pt.nb_web.housync.utils.DrawerHelper;
 
-public class HouseManagerActivity extends AppCompatActivity {
+public class HouseManagerActivity extends AppCompatActivity
+        implements HouseManagerActivityFragment.Listener, HouseDetailsActivityFragment.Listener{
     private DrawerHelper drawerHelper;
+
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_house_manager);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -41,13 +49,16 @@ public class HouseManagerActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), HouseDetailsActivity.class);
-                startActivity(intent);
+                Intent intent = new Intent(view.getContext(), AddHouseActivity.class);
+                startActivityForResult(intent, Commons.HOUSE_ADD_ACTIVIY_RESULT);
             }
         });
 
 
-        setupHouseManagerView(this);
+        if (findViewById(R.id.fragment_house_details) != null) {
+            mTwoPane = true;
+        }
+
         drawerHelper = new DrawerHelper(this,toolbar);
     }
 
@@ -100,24 +111,64 @@ public class HouseManagerActivity extends AppCompatActivity {
         AppEventsLogger.deactivateApp(this);
     }
 
-    private void setupHouseManagerView(final Context context) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        HouseService houseService = HouseService.getInstance(this);
+        HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
+                ((RecyclerView)findViewById(R.id.house_manager_view)).getAdapter();
 
-        HouseService houseService = HouseService.getInstance(context);
         List<House> housesList = houseService.getAllItems();
-        setupRecycleView(housesList);
+
+        if (requestCode == Commons.HOUSE_ADD_ACTIVIY_RESULT){
+            if (housesList.size() != houseRecyclerAdapter.getItemCount()){
+                houseRecyclerAdapter.updateList(housesList);
+                houseRecyclerAdapter.notifyItemInserted(housesList.size());
+            }
+        }else if( requestCode == Commons.HOUSE_DETAILS_ACTIVIY_RESULT){
+            if (housesList.size() != houseRecyclerAdapter.getItemCount()){
+                houseRecyclerAdapter.updateList(housesList);
+                houseRecyclerAdapter.notifyDataSetChanged();
+            }
+        }
 
     }
 
-    private void setupRecycleView(final List<House> houseList){
-        RecyclerView shoppingListRecyclerView = (RecyclerView) findViewById(R.id.house_manager_view);
-        shoppingListRecyclerView.setHasFixedSize(true);
 
-        LinearLayoutManager llm = new LinearLayoutManager(this);
+    @Override
+    public void onItemSelected(int id) {
+        if (mTwoPane) {
+            Bundle arguments = new Bundle();
+            arguments.putInt(Commons.HOUSE_LOCAL_ID_PARAMETER, id);
 
-        shoppingListRecyclerView.setLayoutManager(llm);
-        HouseRecyclerAdapter houseRecyclerAdapter = new HouseRecyclerAdapter(houseList);
-        shoppingListRecyclerView.setAdapter(houseRecyclerAdapter);
+            HouseDetailsActivityFragment fragment = new HouseDetailsActivityFragment();
+            fragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction().replace(
+                    R.id.fragment_house_details, fragment).commit();
+
+
+        } else {
+            Intent intent = new Intent(this , HouseDetailsActivity.class);
+            intent.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, id);
+            startActivityForResult(intent, Commons.HOUSE_DETAILS_ACTIVIY_RESULT);
+        }
     }
 
+    @Override
+    public void onHouseDeleted(House house) {
+        HouseService houseService = HouseService.getInstance(this);
+        HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
+                ((RecyclerView)findViewById(R.id.house_manager_view)).getAdapter();
 
+        int positionRecycler = houseRecyclerAdapter.getItemPosition(house);
+        houseService.delete(house);
+
+        List<House> housesList = houseService.getAllItems();
+        houseRecyclerAdapter.updateList(housesList);
+
+        houseRecyclerAdapter.notifyItemRemoved(positionRecycler);
+
+        getSupportFragmentManager().beginTransaction().replace(
+                R.id.fragment_house_details, new HouseDetailsActivityFragment()).commit();
+    }
 }

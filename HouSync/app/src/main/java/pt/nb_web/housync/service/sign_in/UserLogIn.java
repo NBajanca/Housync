@@ -13,6 +13,14 @@ public class UserLogIn {
     private final Context context;
     private SharedPreferences userSharedPref;
 
+    private static UserLogIn instance;
+
+    public static synchronized UserLogIn getInstance(Context context) {
+        if (instance == null)
+            instance = new UserLogIn(context);
+        return instance;
+    }
+
     public UserLogIn(Context context){
         this.context = context;
         userSharedPref = context.getSharedPreferences(
