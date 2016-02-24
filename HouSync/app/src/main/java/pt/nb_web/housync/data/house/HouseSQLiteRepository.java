@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import pt.nb_web.housync.model.House;
 
 import static pt.nb_web.housync.data.house.HouseDBContract.COMMA_SEP;
+import static pt.nb_web.housync.data.house.HouseDBContract.CURRENT_TIMESTAMP;
 import static pt.nb_web.housync.data.house.HouseDBContract.HouseEntry;
 import static pt.nb_web.housync.data.house.HouseDBContract.getWritableDatabase;
 
@@ -43,16 +44,18 @@ public class HouseSQLiteRepository {
         return local_id;
     }
 
+    //// TODO: 24/02/2016  Add snapshots
     public int add(House house) {
         db.execSQL("INSERT INTO " +
                         HouseEntry.HOUSE_TABLE_NAME + "("
                         +HouseEntry.COLUMN_NAME_ID+COMMA_SEP
                         +HouseEntry.COLUMN_NAME_NAME+COMMA_SEP
-                        +HouseEntry.COLUMN_NAME_ID_ADMIN
+                        +HouseEntry.COLUMN_NAME_ID_ADMIN+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_CREATE_TIME
                         + ") " +
-                        "VALUES(?, ?, ?)",
+                        "VALUES(?, ?, ?, ?)",
                 new Object[]{house.getHouseId(), house.getHouseName()
-                        , house.getAdminId()});
+                        , house.getAdminId(), house.getCreateTime()});
 
         HouseCursor houseCursor = new HouseCursor(
                 db.rawQuery("SELECT "+HouseEntry.COLUMN_NAME_LOCAL_ID +
@@ -101,4 +104,21 @@ public class HouseSQLiteRepository {
                         +" WHERE " + HouseEntry.COLUMN_NAME_LOCAL_ID + " = ?",
                         new String[]{Integer.toString(houseLocalId)}));
     }
+
+    //// TODO: 24/02/2016  Add snapshots
+    public void update(House house) {
+        db.execSQL("UPDATE " +HouseEntry.HOUSE_TABLE_NAME
+                        + " SET "
+                        +HouseEntry.COLUMN_NAME_ID+ " = ?"+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_NAME+ " = ?"+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_ID_ADMIN+ " = ?"+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_CREATE_TIME+ " = ?"
+                        + " WHERE "
+                        +HouseEntry.COLUMN_NAME_LOCAL_ID+ " = ?;",
+                new Object[]{house.getHouseId(), house.getHouseName()
+                        , house.getAdminId(), house.getCreateTime()
+                        , house.getHouseLocalId()});
+    }
 }
+
+

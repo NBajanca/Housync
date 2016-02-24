@@ -2,6 +2,7 @@ package pt.nb_web.housync.service;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class HouseService {
 
         HouseCursor cursor = repository.findAll();
         final int count = cursor.getCount();
+        Log.d("HouseService", "# of Houses: " + Integer.toString(count));
 
         final List<House> housesList = new ArrayList<House>();
 
@@ -65,4 +67,7 @@ public class HouseService {
 
     public void delete(House item){ repository.delete(item);}
 
+    public void update(House house) {
+        repository.update(house);
+    }
 }

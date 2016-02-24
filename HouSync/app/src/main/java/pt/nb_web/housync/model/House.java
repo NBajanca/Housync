@@ -60,4 +60,14 @@ public class House extends HouSyncHouse {
 
         return response;
     }
+
+    public com.example.nuno.myapplication.housync_backend.myApi.model.HouSyncHouse getHouSyncHouseFromHouse(House house) {
+        com.example.nuno.myapplication.housync_backend.myApi.model.HouSyncHouse response = new
+                com.example.nuno.myapplication.housync_backend.myApi.model.HouSyncHouse();
+
+        response.setHouseName(house.getHouseName());
+        response.setAdminId(house.getAdminId());
+        response.setCreateTime(house.getCreateTime());
+        return response;
+    }
 }

@@ -1,6 +1,7 @@
 package pt.nb_web.housync.fragments;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +31,7 @@ public class HouseManagerActivityFragment extends Fragment {
     private HouseRecyclerAdapter houseRecyclerAdapter;
 
     private Listener listener;
+    private AsyncTask<List<House>, Void, List<House>> updateListAsyncTask;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,10 +61,8 @@ public class HouseManagerActivityFragment extends Fragment {
         if (NetworkHelper.isOnline(context)){
             UserLogIn userLoginService = UserLogIn.getInstance(context);
             if(userLoginService.checkIfLogedIn()){
-                ProgressDialogHelper.show(context, "Updating Houses...");
-                new UpdateHouseListAsyncTask(view,
+                updateListAsyncTask = new UpdateHouseListAsyncTask(view,
                         userLoginService.getUserId()).execute(housesList);
-                housesList = houseService.getAllItems();
             }
         }
         setupRecycleView(housesList, view);
@@ -89,5 +89,12 @@ public class HouseManagerActivityFragment extends Fragment {
 
     public interface Listener {
         public void onItemSelected(int id);
+    }
+
+    @Override
+    public void onDestroyView (){
+        if (updateListAsyncTask != null)
+            updateListAsyncTask.cancel(true);
+        super.onDestroyView();
     }
 }

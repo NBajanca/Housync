@@ -299,7 +299,7 @@ public class MyEndpoint {
             String url = getDBUrl(HOUSE_DB);
             Connection connection = DriverManager.getConnection(url);
             try {
-                String statement = "SELECT * " +
+                String statement = "SELECT id " +
                         "FROM house inner join user_house " +
                         "WHERE id = id_house " +
                         "AND id_user = ?";
@@ -309,9 +309,7 @@ public class MyEndpoint {
 
                 while (resultSet.next()){
                     int houseId = resultSet.getInt("id");
-                    String houseName = resultSet.getString("name");
-                    int adminId = resultSet.getInt("id_admin");
-                    HouSyncHouse house = new HouSyncHouse(houseId, houseName, adminId);
+                    HouSyncHouse house = new HouSyncHouse(houseId);
                     houSyncHouses.add(house);
                 }
 
