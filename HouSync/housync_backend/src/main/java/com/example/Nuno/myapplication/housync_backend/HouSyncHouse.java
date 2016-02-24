@@ -23,6 +23,10 @@ public class HouSyncHouse {
 
     }
 
+    public HouSyncHouse(int houseId) {
+        setHouseId(houseId);
+    }
+
     public int getHouseId() {
         return houseId;
     }

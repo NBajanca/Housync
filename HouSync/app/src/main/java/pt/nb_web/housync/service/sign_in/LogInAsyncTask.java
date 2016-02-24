@@ -2,6 +2,8 @@ package pt.nb_web.housync.service.sign_in;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.example.nuno.myapplication.housync_backend.myApi.MyApi;
 import com.example.nuno.myapplication.housync_backend.myApi.model.HouSyncUser;
@@ -26,19 +28,20 @@ public class LogInAsyncTask extends AsyncTask<SignInAccount, Void, HouSyncUser> 
 
     @Override
     protected HouSyncUser doInBackground(SignInAccount... params) {
-
+        Log.d("LogInAsync", "Entered");
         signInAccount = params[0];
         if (signInAccount == null) return null;
 
         UserLogIn userLogIn = new UserLogIn(context);
 
-            if(myApiService == null) {  // Only do this once
+        if(myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
                     .setRootUrl("https://housync-android.appspot.com/_ah/api/");
 
             myApiService = builder.build();
         }
 
+        Log.d("LogInAsync", "API obtained");
         try {
             HouSyncUser houSyncUser = new HouSyncUser();
             if (signInAccount instanceof GoogleAccount){
@@ -52,23 +55,29 @@ public class LogInAsyncTask extends AsyncTask<SignInAccount, Void, HouSyncUser> 
                 houSyncUser.setUserId(userLogIn.getUserId());
                 houSyncUser.setUserName(facebookAccount.getUserName());
                 houSyncUser.setEmail(facebookAccount.getEmail());
-                //return myApiService.signInFacebook(facebookAccount.getAccessToken().getUserId(), userLogIn.getUserId()).execute();
+                Log.d("LogInAsync", "ID: "+ facebookAccount.getAccessToken().getUserId());
+                return myApiService.signInFacebook(facebookAccount.getAccessToken().getUserId(), houSyncUser).execute();
             }
         } catch (IOException e) {
+            Log.d("LogInAsync", "IOException");
             e.getMessage();
             return null;
         }
-        return null;
     }
 
     @Override
     protected void onPostExecute(HouSyncUser result) {
         super.onPostExecute(result);
 
+        Log.d("LogInAsync", "Result code:" + result.getErrorCode());
+
         if (result != null && result.getErrorCode() == 0){
             UserLogIn userLogIn = new UserLogIn(context);
             userLogIn.setUserName(result.getUserName());
             userLogIn.setUserId(result.getUserId());
+        }else{
+            Toast.makeText(context, result.getUserName(), Toast.LENGTH_LONG).show();
+
         }
     }
 }

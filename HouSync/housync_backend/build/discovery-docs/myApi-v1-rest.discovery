@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/R0z2jLh4iJVefoLqh0Hb3K_ajeI\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/9h7oGWWx5Rh_-dP563dD7hwC4iw\"",
  "discoveryVersion": "v1",
  "id": "myApi:v1",
  "name": "myApi",
@@ -81,6 +81,9 @@
      "type": "integer",
      "format": "int32"
     },
+    "createTime": {
+     "type": "string"
+    },
     "errorCode": {
      "type": "integer",
      "format": "int32"
@@ -92,7 +95,13 @@
     "houseName": {
      "type": "string"
     },
+    "lastSync": {
+     "type": "string"
+    },
     "snapShot": {
+     "type": "string"
+    },
+    "snapShotUser": {
      "type": "string"
     }
    }
@@ -139,6 +148,50 @@
     "$ref": "HouSyncHouse",
     "parameterName": "resource"
    },
+   "response": {
+    "$ref": "HouSyncHouse"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "getAllHouses": {
+   "id": "myApi.getAllHouses",
+   "path": "housynchousecollection/{userId}",
+   "httpMethod": "GET",
+   "parameters": {
+    "userId": {
+     "type": "integer",
+     "required": true,
+     "format": "int32",
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "userId"
+   ],
+   "response": {
+    "$ref": "HouSyncHouseCollection"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "getHouseData": {
+   "id": "myApi.getHouseData",
+   "path": "housynchouse/{houseId}",
+   "httpMethod": "GET",
+   "parameters": {
+    "houseId": {
+     "type": "integer",
+     "required": true,
+     "format": "int32",
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "houseId"
+   ],
    "response": {
     "$ref": "HouSyncHouse"
    },
@@ -195,34 +248,6 @@
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"
    ]
-  }
- },
- "resources": {
-  "myEndpoint": {
-   "methods": {
-    "getAllHouses": {
-     "id": "myApi.myEndpoint.getAllHouses",
-     "path": "housynchousecollection/{userId}",
-     "httpMethod": "GET",
-     "parameters": {
-      "userId": {
-       "type": "integer",
-       "required": true,
-       "format": "int32",
-       "location": "path"
-      }
-     },
-     "parameterOrder": [
-      "userId"
-     ],
-     "response": {
-      "$ref": "HouSyncHouseCollection"
-     },
-     "scopes": [
-      "https://www.googleapis.com/auth/userinfo.email"
-     ]
-    }
-   }
   }
  }
 }

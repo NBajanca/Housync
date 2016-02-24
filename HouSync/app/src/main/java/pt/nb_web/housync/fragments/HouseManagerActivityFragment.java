@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -15,6 +16,10 @@ import pt.nb_web.housync.R;
 import pt.nb_web.housync.adapter.HouseRecyclerAdapter;
 import pt.nb_web.housync.model.House;
 import pt.nb_web.housync.service.HouseService;
+import pt.nb_web.housync.service.UpdateHouseListAsyncTask;
+import pt.nb_web.housync.service.sign_in.UserLogIn;
+import pt.nb_web.housync.utils.NetworkHelper;
+import pt.nb_web.housync.utils.ProgressDialogHelper;
 import pt.nb_web.housync.utils.RecyclerItemClickListener;
 
 /**
@@ -47,11 +52,20 @@ public class HouseManagerActivityFragment extends Fragment {
     }
 
     private void setupHouseManagerView(final Context context, View view) {
-
         houseService = HouseService.getInstance(context);
-        List<House> housesList = houseService.getAllItems();
-        setupRecycleView(housesList, view);
+        List<House> localHousesList = houseService.getAllItems();
+        List<House> housesList = localHousesList;
 
+        if (NetworkHelper.isOnline(context)){
+            UserLogIn userLoginService = UserLogIn.getInstance(context);
+            if(userLoginService.checkIfLogedIn()){
+                ProgressDialogHelper.show(context, "Updating Houses...");
+                new UpdateHouseListAsyncTask(view,
+                        userLoginService.getUserId()).execute(housesList);
+                housesList = houseService.getAllItems();
+            }
+        }
+        setupRecycleView(housesList, view);
     }
 
     private void setupRecycleView(final List<House> houseList, View view){

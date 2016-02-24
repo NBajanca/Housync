@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.facebook.FacebookSdk;
 
@@ -72,13 +73,18 @@ public class LogInActivity extends AppCompatActivity{
         UserLogIn userLogIn = new UserLogIn(this);
 
         if(userLogIn.checkIfLogedIn()){
+            Log.d("updateLoginState", "Valid LogIn");
             if((googleAccount.getGoogleSignInAccount() == null) && (facebookAccount.getAccessToken() == null)){
+                Log.d("updateLoginState", "LogIn Invalid, Loging out");
                 userLogIn.clearUser();
             }
         }else{
+            Log.d("updateLoginState", "No valid Login");
             if(googleAccount.getGoogleSignInAccount() != null){
+                Log.d("updateLoginState", "Login in with Google");
                 new LogInAsyncTask(this).execute((SignInAccount) googleAccount);
             }else if(facebookAccount.getAccessToken() != null) {
+                Log.d("updateLoginState", "Login in with Facebook");
                 new LogInAsyncTask(this).execute((SignInAccount) facebookAccount);
             }
         }

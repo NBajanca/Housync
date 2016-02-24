@@ -9,7 +9,9 @@ import java.util.List;
 import pt.nb_web.housync.R;
 import pt.nb_web.housync.data.house.HouseCursor;
 import pt.nb_web.housync.data.house.HouseSQLiteRepository;
+import pt.nb_web.housync.exception.HouseNotFoundException;
 import pt.nb_web.housync.model.House;
+import pt.nb_web.housync.utils.Commons;
 
 /**
  * Created by Nuno on 21/02/2016.
@@ -40,11 +42,8 @@ public class HouseService {
         final List<House> housesList = new ArrayList<House>();
 
         while (cursor.moveToNext()) {
-            int itemLocalId = cursor.getLocalId();
-            String itemName = cursor.getName();
+            housesList.add(cursor.getHouse());
 
-            House item = new House(itemLocalId, itemName);
-            housesList.add(item);
             if (housesList.size() == count)
                 break;
         }
@@ -53,17 +52,16 @@ public class HouseService {
         return housesList;
     }
 
-    public House getHouse(House item){
-        HouseCursor cursor = repository.getHouse(item);
+    public House getHouse(int houseLocalID) throws HouseNotFoundException {
+        HouseCursor cursor = repository.getHouse(houseLocalID);
         if(cursor.moveToFirst()){
             return cursor.getHouse();
-        }else{
-            item.setErrorCode(1);
-            return item;
-        }
+        }else throw new HouseNotFoundException();
     }
 
-    public void add(House item){ repository.addNew(item);}
+    public void addNew(House item){ repository.addNew(item);}
+
+    public void add(House item){ repository.add(item);}
 
     public void delete(House item){ repository.delete(item);}
 

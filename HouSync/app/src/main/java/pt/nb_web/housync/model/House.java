@@ -49,4 +49,15 @@ public class House extends HouSyncHouse {
     public int hashCode() {
         return getHouseLocalId();
     }
+
+    public static House getHouseFromHouSyncHouse(com.example.nuno.myapplication.housync_backend.myApi.model.HouSyncHouse house) {
+        House response = new House(house.getHouseName(), house.getAdminId());
+        response.setHouseId(house.getHouseId());
+        response.setSnapShot(house.getSnapShot());
+        response.setSnapShotUser(house.getSnapShotUser());
+        response.setCreateTime(house.getCreateTime());
+        response.setLastSync(house.getLastSync());
+
+        return response;
+    }
 }

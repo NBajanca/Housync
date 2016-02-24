@@ -43,6 +43,30 @@ public class HouseSQLiteRepository {
         return local_id;
     }
 
+    public int add(House house) {
+        db.execSQL("INSERT INTO " +
+                        HouseEntry.HOUSE_TABLE_NAME + "("
+                        +HouseEntry.COLUMN_NAME_ID+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_NAME+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_ID_ADMIN
+                        + ") " +
+                        "VALUES(?, ?, ?)",
+                new Object[]{house.getHouseId(), house.getHouseName()
+                        , house.getAdminId()});
+
+        HouseCursor houseCursor = new HouseCursor(
+                db.rawQuery("SELECT "+HouseEntry.COLUMN_NAME_LOCAL_ID +
+                                " FROM " + HouseEntry.HOUSE_TABLE_NAME +
+                                " WHERE " + HouseEntry.COLUMN_NAME_ID + " = ?;",
+                        new String[]{Integer.toString(house.getHouseId())}));
+
+        houseCursor.moveToFirst();
+        int local_id = houseCursor.getLocalId();
+        houseCursor.close();
+
+        return local_id;
+    }
+
     public void delete(House house) {
         db.execSQL("DELETE FROM " + HouseEntry.HOUSE_TABLE_NAME + " WHERE "
                         + HouseEntry.COLUMN_NAME_LOCAL_ID + " = ?",
@@ -71,10 +95,10 @@ public class HouseSQLiteRepository {
                         null));
     }
 
-    public HouseCursor getHouse(House item) {
+    public HouseCursor getHouse(int houseLocalId) {
         return new HouseCursor(
                 db.rawQuery("SELECT * FROM " + HouseEntry.HOUSE_TABLE_NAME
                         +" WHERE " + HouseEntry.COLUMN_NAME_LOCAL_ID + " = ?",
-                        new String[]{item.getLocalIdString()}));
+                        new String[]{Integer.toString(houseLocalId)}));
     }
 }

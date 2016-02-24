@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import pt.nb_web.housync.R;
 import pt.nb_web.housync.adapter.HouseRecyclerAdapter;
+import pt.nb_web.housync.exception.HouseNotFoundException;
 import pt.nb_web.housync.model.House;
 import pt.nb_web.housync.service.HouseService;
 import pt.nb_web.housync.utils.Commons;
@@ -25,28 +27,31 @@ public class HouseDetailsActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_house_details, container, false);
 
-        TextView nameTextView = (TextView) view.findViewById(R.id.house_fragment_house_name);
-
+        View view;
         final int houseLocalId = getHouseLocalId();
+
         if(houseLocalId >= 1){
-            HouseService houseService = HouseService.getInstance(view.getContext());
+            view = inflater.inflate(R.layout.fragment_house_details, container, false);
+            TextView nameTextView = (TextView) view.findViewById(R.id.house_fragment_house_name);
+            HouseService houseService = HouseService.getInstance(this.getContext());
+            try {
+                house = houseService.getHouse(houseLocalId);
+                nameTextView.setText(house.getHouseName());
 
-            house = new House(houseLocalId);
-            house = houseService.getHouse(house);
-
-            nameTextView.setText(house.getHouseName());
-
-            view.findViewById(R.id.delete_house).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onHouseDeleted(house);
-                }
-            });
-
+                view.findViewById(R.id.delete_house).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onHouseDeleted(houseLocalId);
+                    }
+                });
+            } catch (HouseNotFoundException e) {
+                Log.d("HouseDetailsFragment", "House not found: " + Integer.toString(houseLocalId));
+                e.printStackTrace();
+                return view;
+            }
         }else{
-            nameTextView.setText("Select a House");
+            view = inflater.inflate(R.layout.fragment_no_house_details, container, false);
         }
 
         return view;
@@ -64,7 +69,6 @@ public class HouseDetailsActivityFragment extends Fragment {
     }
 
     public int getHouseLocalId() {
-        Bundle bundle = getArguments();
         if(getArguments() != null){
             return getArguments().getInt(Commons.HOUSE_LOCAL_ID_PARAMETER, 0);
         }
@@ -80,6 +84,6 @@ public class HouseDetailsActivityFragment extends Fragment {
     }
 
     public interface Listener {
-        public void onHouseDeleted(House house);
+        public void onHouseDeleted(int houseLocalId);
     }
 }

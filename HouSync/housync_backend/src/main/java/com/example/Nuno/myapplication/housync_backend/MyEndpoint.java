@@ -12,7 +12,6 @@ import com.google.api.server.spi.config.ApiNamespace;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -38,7 +37,14 @@ public class MyEndpoint {
     private final static int USER_DB = 1;
     private final static int HOUSE_DB = 2;
 
-    /**Method to process google Sign In) */
+
+    /**
+     * Process google Sign In
+     *
+     * @param googleUserId
+     * @param user
+     * @return
+     */
     @ApiMethod(name = "signInGoogle")
     public HouSyncUser signInGoogle(@Named("googleUserId") String googleUserId, HouSyncUser user) {
         HouSyncUser response = new HouSyncUser();
@@ -136,7 +142,14 @@ public class MyEndpoint {
     }
 
 
-    /**Method to process Facebook Sign In) */
+
+    /**
+     * Process Facebook Sign In
+     *
+     * @param facebookUserId
+     * @param user
+     * @return
+     */
     @ApiMethod(name = "signInFacebook")
     public HouSyncUser signInFacebook(@Named("facebookUserId") String facebookUserId, HouSyncUser user) {
         HouSyncUser response = new HouSyncUser();
@@ -236,76 +249,54 @@ public class MyEndpoint {
 
     @ApiMethod(name = "createHouse")
     public HouSyncHouse createHouse(HouSyncHouse house){
-
-        String url = null;
-        StringWriter error = new StringWriter();
+        HouSyncHouse response = null;
 
         try {
-            url = getDBUrl(HOUSE_DB);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            house.setErrorCode(-1);
-            return house;
-        }
-
-        try {
+            String url = getDBUrl(HOUSE_DB);
             Connection connection = DriverManager.getConnection(url);
             try {
-                String statement = "INSERT INTO house (name, id_admin) " +
-                        "VALUES (?, ?);";
-                PreparedStatement stmt = connection.prepareStatement(statement);
-                stmt.setString(1, house.getHouseName());
-                stmt.setInt(2, house.getAdminId());
-                stmt.execute();
-
-                statement = "SELECT id FROM house " +
-                        "WHERE id_admin = ? " +
-                        "ORDER BY create_time DESC;";
-                stmt = connection.prepareStatement(statement);
-                stmt.setInt(1, house.getAdminId());
-                ResultSet resultSet = stmt.executeQuery();
-
-                resultSet.first();
-                int houseId = resultSet.getInt("id");
-                house.setHouseId(houseId);
-
-                statement = "INSERT INTO user_house (id_user, id_house) " +
-                        "VALUES (?, ?);";
-                stmt = connection.prepareStatement(statement);
-                stmt.setInt(1, house.getAdminId());
-                stmt.setInt(2, house.getHouseId());
-                stmt.execute();
+                response = createHouse(house.getHouseName(), house.getAdminId(), connection);
 
             }finally {
                 connection.close();
             }
+        } catch (ClassNotFoundException e) {
+            response = getErrorResponse (e, -1);
         } catch (SQLException e) {
-            e.printStackTrace(new PrintWriter(error));
-            house.setHouseName(error.toString());
-            house.setErrorCode(-2);
+            response = getErrorResponse (e, -2);
         }
 
-        return house;
+        return response;
     }
 
+    @ApiMethod(name = "getHouseData")
+    public HouSyncHouse getHouseData(@Named("houseId")int houseId){
+        HouSyncHouse response = null;
+
+        try {
+            String url = getDBUrl(HOUSE_DB);
+            Connection connection = DriverManager.getConnection(url);
+            try {
+                response = getHouseData(houseId, connection);
+
+            }finally {
+                connection.close();
+            }
+        } catch (ClassNotFoundException e) {
+            response = getErrorResponse (e, -1);
+        } catch (SQLException e) {
+            response = getErrorResponse (e, -2);
+        }
+
+        return response;
+    }
+
+    @ApiMethod(name = "getAllHouses")
     public List<HouSyncHouse> getAllHouses(@Named("userId") int houSyncUserId){
         List<HouSyncHouse> houSyncHouses = new ArrayList<HouSyncHouse>();
 
-        String url = null;
-        StringWriter error = new StringWriter();
-
         try {
-            url = getDBUrl(HOUSE_DB);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            HouSyncHouse house = new HouSyncHouse();
-            house.setErrorCode(-1);
-            houSyncHouses.clear();
-            houSyncHouses.add(house);
-            return houSyncHouses;
-        }
-
-        try {
+            String url = getDBUrl(HOUSE_DB);
             Connection connection = DriverManager.getConnection(url);
             try {
                 String statement = "SELECT * " +
@@ -327,18 +318,20 @@ public class MyEndpoint {
             }finally {
                 connection.close();
             }
-        } catch (SQLException e) {
-            e.printStackTrace(new PrintWriter(error));
-            HouSyncHouse house = new HouSyncHouse();
-            house.setHouseName(error.toString());
-            house.setErrorCode(-2);
+        } catch (ClassNotFoundException e) {
+            HouSyncHouse response = getErrorResponse (e, -1);
             houSyncHouses.clear();
-            houSyncHouses.add(house);
+            houSyncHouses.add(response);
+        } catch (SQLException e) {
+            HouSyncHouse response = getErrorResponse (e, -2);
+            houSyncHouses.clear();
+            houSyncHouses.add(response);
         }
 
         return houSyncHouses;
 
     }
+
 
     private String getDBUrl(int db) throws ClassNotFoundException {
         String url = null;
@@ -370,6 +363,7 @@ public class MyEndpoint {
         stmt = connection.prepareStatement(statement);
         stmt.setString(1, socialIdHash);
         ResultSet resultSet = stmt.executeQuery();
+        resultSet.first();
         
         return resultSet.getInt("id");
     }
@@ -413,6 +407,70 @@ public class MyEndpoint {
 
 
         return response;
+    }
+
+    private HouSyncHouse getErrorResponse(Exception e, int errorCode) {
+        HouSyncHouse response = new HouSyncHouse();
+        StringWriter error = new StringWriter();
+
+        e.printStackTrace(new PrintWriter(error));
+        response.setHouseName(error.toString());
+        response.setErrorCode(errorCode);
+
+        return response;
+    }
+
+    private HouSyncHouse getHouseData(int houseId, Connection connection) throws SQLException{
+        HouSyncHouse response = new HouSyncHouse(houseId);
+
+        String statement = "SELECT name, id_admin, snapshot, snapshot_user, create_time, last_sync FROM house " +
+                "WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(statement);
+        stmt.setInt(1, houseId);
+        ResultSet resultSet = stmt.executeQuery();
+
+        resultSet.first();
+        response.setHouseName(resultSet.getString("name"));
+        response.setAdminId(resultSet.getInt("id_admin"));
+        response.setSnapShot(resultSet.getString("snapshot"));
+        response.setSnapShotUser(resultSet.getString("snapshot_user"));
+        response.setCreateTime(resultSet.getString("create_time"));
+        response.setLastSync(resultSet.getString("last_sync"));
+
+        return response;
+    }
+
+    private HouSyncHouse createHouse(String houseName, int adminId, Connection connection) throws SQLException {
+        String statement = "INSERT INTO house (name, id_admin) " +
+                "VALUES (?, ?);";
+        PreparedStatement stmt = connection.prepareStatement(statement);
+        stmt.setString(1, houseName);
+        stmt.setInt(2, adminId);
+        stmt.execute();
+
+        statement = "SELECT id FROM house " +
+                "WHERE id_admin = ? " +
+                "ORDER BY create_time DESC;";
+        stmt = connection.prepareStatement(statement);
+        stmt.setInt(1, adminId);
+        ResultSet resultSet = stmt.executeQuery();
+
+        resultSet.first();
+        int houseId = resultSet.getInt("id");
+
+        insertUserInHouse(houseId, adminId, connection);
+
+        return getHouseData(houseId, connection);
+
+    }
+
+    private void insertUserInHouse(int houseId, int userId, Connection connection) throws SQLException {
+        String statement = "INSERT INTO user_house (id_user, id_house) " +
+                "VALUES (?, ?);";
+        PreparedStatement stmt = connection.prepareStatement(statement);
+        stmt.setInt(1, userId);
+        stmt.setInt(2, houseId);
+        stmt.execute();
     }
 
 }

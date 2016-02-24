@@ -1,9 +1,11 @@
 package pt.nb_web.housync.activities;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -69,25 +71,20 @@ public class HouseDetailsActivity extends AppCompatActivity
     }
 
     private void deleteHouse(){
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(R.string.delete_house_alert_title)
-                .setMessage(R.string.delete_house_alert_text)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        HouseService houseService = HouseService.getInstance(getBaseContext());
-                        houseService.delete(fragment.getHouse());
-                        finish();
-                    }
-                })
-                .setNegativeButton("No", null)
-                .show();
+        Intent data = new Intent();
+        data.putExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE);
+        data.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, fragment.getHouseLocalId());
+
+        if (getParent() == null) {
+            setResult(Activity.RESULT_OK, data);
+        } else {
+            getParent().setResult(Activity.RESULT_OK, data);
+        }
+        finish();
     }
 
     @Override
-    public void onHouseDeleted(House house) {
+    public void onHouseDeleted(int houseLocalId) {
         deleteHouse();
     }
 }

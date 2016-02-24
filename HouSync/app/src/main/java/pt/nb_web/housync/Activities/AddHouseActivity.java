@@ -17,8 +17,16 @@ import pt.nb_web.housync.service.sign_in.UserLogIn;
 import pt.nb_web.housync.utils.Commons;
 import pt.nb_web.housync.utils.ProgressDialogHelper;
 
+
 public class AddHouseActivity extends AppCompatActivity implements View.OnClickListener {
 
+    /**
+     * @see AppCompatActivity
+     *
+     * Adds a OnClickListener to the <code>add_house_button</code>
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +52,7 @@ public class AddHouseActivity extends AppCompatActivity implements View.OnClickL
         int adminId = userLogIn.getUserId();
         House newHouse = new House(name, adminId);
 
-        service.add(newHouse);
+        service.addNew(newHouse);
         finish();
     }
 }
