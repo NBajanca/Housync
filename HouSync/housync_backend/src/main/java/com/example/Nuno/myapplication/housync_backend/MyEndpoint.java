@@ -255,7 +255,7 @@ public class MyEndpoint {
             String url = getDBUrl(HOUSE_DB);
             Connection connection = DriverManager.getConnection(url);
             try {
-                response = createHouse(house.getHouseName(), house.getAdminId(), connection);
+                response = createHouse(house.getHouseName(), house.getAdminId(), house.getCreateTime(),connection);
 
             }finally {
                 connection.close();
@@ -267,6 +267,26 @@ public class MyEndpoint {
         }
 
         return response;
+    }
+
+    @ApiMethod(name = "deleteHouse")
+    public void deleteHouse(@Named("houseId")int houseId){
+        try {
+            String url = getDBUrl(HOUSE_DB);
+            Connection connection = DriverManager.getConnection(url);
+            try {
+                deleteHouse(houseId, connection);
+
+            }finally {
+                connection.close();
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return;
     }
 
     @ApiMethod(name = "getHouseData")
@@ -438,17 +458,18 @@ public class MyEndpoint {
         return response;
     }
 
-    private HouSyncHouse createHouse(String houseName, int adminId, Connection connection) throws SQLException {
-        String statement = "INSERT INTO house (name, id_admin) " +
-                "VALUES (?, ?);";
+    private HouSyncHouse createHouse(String houseName, int adminId, String createTime, Connection connection) throws SQLException {
+        String statement = "INSERT INTO house (name, id_admin, create_time) " +
+                "VALUES (?, ?, ?);";
         PreparedStatement stmt = connection.prepareStatement(statement);
         stmt.setString(1, houseName);
         stmt.setInt(2, adminId);
+        stmt.setString(3, createTime);
         stmt.execute();
 
         statement = "SELECT id FROM house " +
                 "WHERE id_admin = ? " +
-                "ORDER BY create_time DESC;";
+                "ORDER BY last_sync DESC;";
         stmt = connection.prepareStatement(statement);
         stmt.setInt(1, adminId);
         ResultSet resultSet = stmt.executeQuery();
@@ -460,6 +481,15 @@ public class MyEndpoint {
 
         return getHouseData(houseId, connection);
 
+    }
+
+    private void deleteHouse(int houseId, Connection connection) throws SQLException {
+
+        String statement = "DELETE FROM house "+
+                "WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(statement);
+        stmt.setInt(1, houseId);
+        stmt.execute();
     }
 
     private void insertUserInHouse(int houseId, int userId, Connection connection) throws SQLException {

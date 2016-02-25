@@ -11,7 +11,7 @@ import com.facebook.FacebookSdk;
 import pt.nb_web.housync.R;
 import pt.nb_web.housync.service.sign_in.FacebookAccount;
 import pt.nb_web.housync.service.sign_in.GoogleAccount;
-import pt.nb_web.housync.service.sign_in.LogInAsyncTask;
+import pt.nb_web.housync.background.LogInAsyncTask;
 import pt.nb_web.housync.service.sign_in.SignInAccount;
 import pt.nb_web.housync.service.sign_in.UserLogIn;
 

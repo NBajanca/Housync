@@ -61,13 +61,40 @@ public class HouseService {
         }else throw new HouseNotFoundException();
     }
 
-    public void addNew(House item){ repository.addNew(item);}
+    public int addNew(House item){
+        return repository.addNew(item);
+    }
 
     public void add(House item){ repository.add(item);}
 
     public void delete(House item){ repository.delete(item);}
 
+    public void setDeleted(int houseID){
+        repository.setDeleted(houseID);
+    }
+
+    public List<Integer> getAllDeleted(){
+        List<Integer> deletedHousesId = new ArrayList<>();
+        HouseCursor cursor = repository.getAllDeleted();
+
+        while (cursor.moveToNext()) {
+            deletedHousesId.add(cursor.getId());
+        }
+
+        cursor.close();
+        return deletedHousesId;
+    }
+
+    public void createOnline (House house) {
+        repository.update(house);
+        insertUser(house.getHouseLocalId(), house.getAdminId());
+    }
+
     public void update(House house) {
         repository.update(house);
+    }
+
+    public void insertUser(int houseID, int userID){
+        repository.insertUser(houseID, userID);
     }
 }

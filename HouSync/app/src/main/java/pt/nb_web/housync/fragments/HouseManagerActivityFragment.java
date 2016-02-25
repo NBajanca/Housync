@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -17,10 +16,9 @@ import pt.nb_web.housync.R;
 import pt.nb_web.housync.adapter.HouseRecyclerAdapter;
 import pt.nb_web.housync.model.House;
 import pt.nb_web.housync.service.HouseService;
-import pt.nb_web.housync.service.UpdateHouseListAsyncTask;
+import pt.nb_web.housync.background.UpdateHouseListAsyncTask;
 import pt.nb_web.housync.service.sign_in.UserLogIn;
 import pt.nb_web.housync.utils.NetworkHelper;
-import pt.nb_web.housync.utils.ProgressDialogHelper;
 import pt.nb_web.housync.utils.RecyclerItemClickListener;
 
 /**

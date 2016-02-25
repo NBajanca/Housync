@@ -1,26 +1,21 @@
 package pt.nb_web.housync.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
 
@@ -28,6 +23,8 @@ import java.util.List;
 
 import pt.nb_web.housync.R;
 import pt.nb_web.housync.adapter.HouseRecyclerAdapter;
+import pt.nb_web.housync.background.AddHouseAsyncTask;
+import pt.nb_web.housync.background.DeleteHouseAsyncTask;
 import pt.nb_web.housync.exception.HouseNotFoundException;
 import pt.nb_web.housync.fragments.HouseDetailsActivityFragment;
 import pt.nb_web.housync.fragments.HouseManagerActivityFragment;
@@ -40,6 +37,10 @@ public class HouseManagerActivity extends AppCompatActivity
         implements HouseManagerActivityFragment.Listener, HouseDetailsActivityFragment.Listener{
     private DrawerHelper drawerHelper;
     private HouseService houseService;
+    private AsyncTask<House, Void, Void> deleteHouseAsyncTask;
+    private AsyncTask<House, Void, Void> addHouseAsyncTask;
+
+    private HouseDetailsActivityFragment houseDetailsFragment = null;
 
     private boolean mTwoPane;
 
@@ -56,7 +57,7 @@ public class HouseManagerActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), AddHouseActivity.class);
-                startActivityForResult(intent, Commons.HOUSE_ADD_ACTIVIY_RESULT);
+                startActivityForResult(intent, Commons.HOUSE_ADD_ACTIVIY_REQUEST);
             }
         });
 
@@ -82,6 +83,17 @@ public class HouseManagerActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        Log.d("create_menu", "started");
+        if (mTwoPane && houseDetailsFragment!= null){
+            Log.d("create_menu", "enter1");
+            House house = houseDetailsFragment.getHouse();
+            if (house != null){
+                Log.d("create_menu", "enter2");
+                getMenuInflater().inflate(R.menu.house_manager_tablet, menu);
+                menu.findItem(R.id.menu_house_selected).setTitle(getString(R.string.house_settings_menu_title, house.getHouseName()));
+                return true;
+            }
+        }
         getMenuInflater().inflate(R.menu.house_manager, menu);
         return true;
     }
@@ -96,6 +108,12 @@ public class HouseManagerActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if(id == R.id.action_update){
+            return true;
+        }else if(id == R.id.action_edit){
+            return true;
+        }else if(id == R.id.action_delete){
+            onHouseDeleted(houseDetailsFragment.getHouseLocalId());
         }
 
         return super.onOptionsItemSelected(item);
@@ -120,15 +138,13 @@ public class HouseManagerActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
-                ((RecyclerView)findViewById(R.id.house_manager_view)).getAdapter();
 
-        List<House> housesList = houseService.getAllItems();
-
-        if (requestCode == Commons.HOUSE_ADD_ACTIVIY_RESULT){
-            if (housesList.size() != houseRecyclerAdapter.getItemCount()){
-                houseRecyclerAdapter.updateList(housesList);
-                houseRecyclerAdapter.notifyItemInserted(housesList.size());
+        if (requestCode == Commons.HOUSE_ADD_ACTIVIY_REQUEST){
+            int result = data.getIntExtra(Commons.HOUSE_ADD_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
+            if (result == Commons.HOUSE_ADD_ACTIVIY_RESULT_ADD){
+                int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
+                if (houseLocalId == Commons.NO_EXTRA) return;
+                else addHouse(houseLocalId);
             }
         }else if( requestCode == Commons.HOUSE_DETAILS_ACTIVIY_REQUEST){
             int result = data.getIntExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
@@ -143,6 +159,8 @@ public class HouseManagerActivity extends AppCompatActivity
     }
 
 
+
+
     /**
      * Implementation of of click listener for the recycler view.
      * Creates new activity in
@@ -154,11 +172,12 @@ public class HouseManagerActivity extends AppCompatActivity
             Bundle arguments = new Bundle();
             arguments.putInt(Commons.HOUSE_LOCAL_ID_PARAMETER, id);
 
-            HouseDetailsActivityFragment fragment = new HouseDetailsActivityFragment();
-            fragment.setArguments(arguments);
+            houseDetailsFragment = new HouseDetailsActivityFragment();
+            houseDetailsFragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction().replace(
-                    R.id.fragment_house_details, fragment).commit();
+                    R.id.fragment_house_details, houseDetailsFragment).commit();
+            invalidateOptionsMenu();
         } else {
             Intent intent = new Intent(this , HouseDetailsActivity.class);
             intent.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, id);
@@ -178,6 +197,23 @@ public class HouseManagerActivity extends AppCompatActivity
         deleteHouse(houseLocalId);
         getSupportFragmentManager().beginTransaction().replace(
                 R.id.fragment_house_details, new HouseDetailsActivityFragment()).commit();
+    }
+
+    private void addHouse(int houseLocalId) {
+        HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
+                ((RecyclerView)findViewById(R.id.house_manager_view)).getAdapter();
+        List<House> housesList = houseService.getAllItems();
+
+        houseRecyclerAdapter.updateList(housesList);
+        houseRecyclerAdapter.notifyItemInserted(housesList.size());
+
+        try {
+            House house = houseService.getHouse(houseLocalId);
+            addHouseAsyncTask = new AddHouseAsyncTask(getBaseContext()).execute(house);
+        } catch (HouseNotFoundException e) {
+            Log.d("HouseManager.addHouse", "House not found: " + Integer.toString(houseLocalId));
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -206,13 +242,27 @@ public class HouseManagerActivity extends AppCompatActivity
                             houseRecyclerAdapter.updateList(housesList);
 
                             houseRecyclerAdapter.notifyItemRemoved(positionRecycler);
+
+                            if (house.getHouseId() > 0){
+                                deleteHouseAsyncTask = new DeleteHouseAsyncTask(getBaseContext()).execute(house);
+                            }
                         }
                     })
                     .setNegativeButton("No", null)
                     .show();
         } catch (HouseNotFoundException e) {
-            Log.d("HouseManagerdeleteHouse", "House not found: " + Integer.toString(houseLocalId));
+            Log.d("HouseManager.deleteH", "House not found: " + Integer.toString(houseLocalId));
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (addHouseAsyncTask != null)
+            addHouseAsyncTask.cancel(true);
+
+        if (deleteHouseAsyncTask != null)
+            deleteHouseAsyncTask.cancel(true);
+        super.onDestroy();
     }
 }

@@ -63,7 +63,11 @@ public class HouseDetailsActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_delete) {
+        if(id == R.id.action_update){
+            return true;
+        }else if(id == R.id.action_edit){
+            return true;
+        }else if(id == R.id.action_delete){
             deleteHouse();
         }
 

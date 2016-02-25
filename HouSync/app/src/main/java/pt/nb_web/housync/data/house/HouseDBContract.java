@@ -37,8 +37,15 @@ public class HouseDBContract {
 
     private static final String SQL_CREATE_USER_HOUSE_TABLE =
             "CREATE TABLE IF NOT EXISTS "+ HouseEntry.USER_HOUSE_TABLE_NAME+" ("
-                    +HouseEntry.COLUMN_NAME_HOUSE_ID+INT_CHAR_TYPE+PRIMARY_KEY+NOT_NULL+COMMA_SEP
-                    +HouseEntry.COLUMN_NAME_USER_ID+INT_CHAR_TYPE+PRIMARY_KEY+NOT_NULL+" )";
+                    +HouseEntry.COLUMN_NAME_HOUSE_ID+INT_CHAR_TYPE+NOT_NULL+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_USER_ID+INT_CHAR_TYPE+NOT_NULL+COMMA_SEP
+                    + PRIMARY_KEY + " ("+HouseEntry.COLUMN_NAME_HOUSE_ID+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_USER_ID+") )";
+
+    private static final String SQL_CREATE_DELETE_HOUSE_TABLE =
+            "CREATE TABLE IF NOT EXISTS "+ HouseEntry.DELETE_HOUSE_TABLE_NAME+" ("
+                    +HouseEntry.COLUMN_NAME_ID+INT_CHAR_TYPE+PRIMARY_KEY+NOT_NULL
+                    +" )";
 
 
     public static SQLiteDatabase getWritableDatabase(Context context){
@@ -61,10 +68,11 @@ public class HouseDBContract {
         public static final String COLUMN_NAME_CREATE_TIME= "create_time";
         public static final String COLUMN_NAME_LAST_SYNC= "last_sync";
 
-        public static final String USER_HOUSE_TABLE_NAME = "house";
+        public static final String USER_HOUSE_TABLE_NAME = "user_house";
         public static final String COLUMN_NAME_USER_ID = "user_id";
         public static final String COLUMN_NAME_HOUSE_ID = "house_id";
 
+        public static final String DELETE_HOUSE_TABLE_NAME = "delete_house";
     }
 
     private static class HouseDBHelper extends SQLiteOpenHelper {
@@ -78,6 +86,7 @@ public class HouseDBContract {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(SQL_CREATE_HOUSE_TABLE);
             db.execSQL(SQL_CREATE_USER_HOUSE_TABLE);
+            db.execSQL(SQL_CREATE_DELETE_HOUSE_TABLE);
         }
 
         @Override

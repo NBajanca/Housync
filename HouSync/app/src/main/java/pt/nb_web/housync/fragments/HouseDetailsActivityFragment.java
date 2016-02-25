@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import pt.nb_web.housync.R;
+import pt.nb_web.housync.activities.HouseDetailsActivity;
 import pt.nb_web.housync.adapter.HouseRecyclerAdapter;
 import pt.nb_web.housync.exception.HouseNotFoundException;
 import pt.nb_web.housync.model.House;
@@ -37,7 +38,14 @@ public class HouseDetailsActivityFragment extends Fragment {
             HouseService houseService = HouseService.getInstance(this.getContext());
             try {
                 house = houseService.getHouse(houseLocalId);
-                nameTextView.setText(house.getHouseName());
+
+                if (getActivity() instanceof HouseDetailsActivity){
+                    getActivity().setTitle(house.getHouseName());
+                    ((ViewGroup) nameTextView.getParent()).removeView(nameTextView);
+                }else{
+                    nameTextView.setText(house.getHouseName());
+                }
+
 
                 view.findViewById(R.id.delete_house).setOnClickListener(new View.OnClickListener() {
                     @Override

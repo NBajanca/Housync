@@ -1,5 +1,7 @@
 package pt.nb_web.housync.activities;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -52,7 +54,20 @@ public class AddHouseActivity extends AppCompatActivity implements View.OnClickL
         int adminId = userLogIn.getUserId();
         House newHouse = new House(name, adminId);
 
-        service.addNew(newHouse);
+        int localHouseId = service.addNew(newHouse);
+        addHouse(localHouseId);
+    }
+
+    private void addHouse(int localHouseId){
+        Intent data = new Intent();
+        data.putExtra(Commons.HOUSE_ADD_ACTIVIY_PARAMETER, Commons.HOUSE_ADD_ACTIVIY_RESULT_ADD);
+        data.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, localHouseId);
+
+        if (getParent() == null) {
+            setResult(Activity.RESULT_OK, data);
+        } else {
+            getParent().setResult(Activity.RESULT_OK, data);
+        }
         finish();
     }
 }

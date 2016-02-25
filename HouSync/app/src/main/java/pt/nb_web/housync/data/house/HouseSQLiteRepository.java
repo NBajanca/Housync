@@ -2,6 +2,7 @@ package pt.nb_web.housync.data.house;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import pt.nb_web.housync.model.House;
 
@@ -75,12 +76,31 @@ public class HouseSQLiteRepository {
                         + HouseEntry.COLUMN_NAME_LOCAL_ID + " = ?",
                 new Object[]{house.getHouseLocalId()});
 
-        //House is online, so it has users
         if(house.getHouseId() != 0){
             db.execSQL("DELETE FROM " + HouseEntry.USER_HOUSE_TABLE_NAME + " WHERE "
-                            + HouseEntry.COLUMN_NAME_ID + " = ?",
-                    new Object[]{house.getHouseLocalId()});
+                            + HouseEntry.COLUMN_NAME_HOUSE_ID + " = ?",
+                    new Object[]{house.getHouseId()});
+
+            db.execSQL("INSERT INTO " +
+                            HouseEntry.DELETE_HOUSE_TABLE_NAME + "("
+                            +HouseEntry.COLUMN_NAME_ID
+                            + ") " +
+                            "VALUES(?)",
+                    new Object[]{house.getHouseId()});
         }
+    }
+
+    public void setDeleted(int houseId){
+        db.execSQL("DELETE FROM " + HouseEntry.DELETE_HOUSE_TABLE_NAME + " WHERE "
+                        + HouseEntry.COLUMN_NAME_ID + " = ?",
+                new Object[]{houseId});
+    }
+
+    public HouseCursor getAllDeleted(){
+        return new HouseCursor(
+                db.rawQuery("SELECT "+ HouseEntry.COLUMN_NAME_ID
+                        +" FROM " + HouseEntry.DELETE_HOUSE_TABLE_NAME,
+                        null));
     }
 
     public void updateName(House house) {
@@ -105,7 +125,7 @@ public class HouseSQLiteRepository {
                         new String[]{Integer.toString(houseLocalId)}));
     }
 
-    //// TODO: 24/02/2016  Add snapshots
+    //// TODO: 24/02/2016  Add snapshots and users
     public void update(House house) {
         db.execSQL("UPDATE " +HouseEntry.HOUSE_TABLE_NAME
                         + " SET "
@@ -118,6 +138,16 @@ public class HouseSQLiteRepository {
                 new Object[]{house.getHouseId(), house.getHouseName()
                         , house.getAdminId(), house.getCreateTime()
                         , house.getHouseLocalId()});
+    }
+
+    public void insertUser(int houseId, int userId) {
+        db.execSQL("INSERT INTO " +
+                        HouseEntry.USER_HOUSE_TABLE_NAME + "("
+                        +HouseEntry.COLUMN_NAME_HOUSE_ID+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_USER_ID
+                        + ") " +
+                        "VALUES(?, ?)",
+                new Object[]{houseId, userId});
     }
 }
 

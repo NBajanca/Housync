@@ -12,10 +12,14 @@
 
     <!-- House Manager -->
     <string name="title_activity_house_manager">House Manager</string>
+    <string name="menu_house_selected">House</string>
+    <string name="house_settings_menu_title">%s settings</string>
 
     <!-- House Details -->
     <string name="title_activity_house_details">House Details</string>
-    <string name="action_delete_house">Delete this House</string>
+    <string name="action_update_house">Update (Sync)</string>
+    <string name="action_edit_house">Edit</string>
+    <string name="action_delete_house">Delete</string>
 
 
     <!-- Add House -->
@@ -75,6 +79,7 @@
     <string name="title_activity_edit_house">EditHouseActivity</string>
     <string name="edit_house_name">Name:</string>
     <string name="edit_house_button">Save</string>
+
 
 
 </resources>

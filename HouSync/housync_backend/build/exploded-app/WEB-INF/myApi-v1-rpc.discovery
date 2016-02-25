@@ -1,6 +1,6 @@
 {
  "kind": "discovery#rpcDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/9h7oGWWx5Rh_-dP563dD7hwC4iw\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/DGbjsc98MVx4ny196qXkFngZsZs\"",
  "discoveryVersion": "v1",
  "id": "myApi:v1",
  "name": "myApi",
@@ -151,6 +151,22 @@
    "returns": {
     "$ref": "HouSyncHouse"
    },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "myApi.deleteHouse": {
+   "id": "myApi.deleteHouse",
+   "parameters": {
+    "houseId": {
+     "type": "integer",
+     "required": true,
+     "format": "int32"
+    }
+   },
+   "parameterOrder": [
+    "houseId"
+   ],
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"
    ]
