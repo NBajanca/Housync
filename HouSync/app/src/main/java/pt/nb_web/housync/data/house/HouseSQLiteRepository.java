@@ -45,18 +45,22 @@ public class HouseSQLiteRepository {
         return local_id;
     }
 
-    //// TODO: 24/02/2016  Add snapshots
+
     public int add(House house) {
         db.execSQL("INSERT INTO " +
                         HouseEntry.HOUSE_TABLE_NAME + "("
                         +HouseEntry.COLUMN_NAME_ID+COMMA_SEP
                         +HouseEntry.COLUMN_NAME_NAME+COMMA_SEP
                         +HouseEntry.COLUMN_NAME_ID_ADMIN+COMMA_SEP
-                        +HouseEntry.COLUMN_NAME_CREATE_TIME
+                        +HouseEntry.COLUMN_NAME_SNAPSHOT+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_SNAPSHOT_USER+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_CREATE_TIME+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_LAST_SYNC
                         + ") " +
-                        "VALUES(?, ?, ?, ?)",
+                        "VALUES(?, ?, ?, ?, ?, ?, "+ CURRENT_TIMESTAMP +")",
                 new Object[]{house.getHouseId(), house.getHouseName()
-                        , house.getAdminId(), house.getCreateTime()});
+                        , house.getAdminId(), house.getSnapShot()
+                        , house.getSnapShotUser(), house.getCreateTime()});
 
         HouseCursor houseCursor = new HouseCursor(
                 db.rawQuery("SELECT "+HouseEntry.COLUMN_NAME_LOCAL_ID +
@@ -90,28 +94,6 @@ public class HouseSQLiteRepository {
         }
     }
 
-    public void setDeleted(int houseId){
-        db.execSQL("DELETE FROM " + HouseEntry.DELETE_HOUSE_TABLE_NAME + " WHERE "
-                        + HouseEntry.COLUMN_NAME_ID + " = ?",
-                new Object[]{houseId});
-    }
-
-    public HouseCursor getAllDeleted(){
-        return new HouseCursor(
-                db.rawQuery("SELECT "+ HouseEntry.COLUMN_NAME_ID
-                        +" FROM " + HouseEntry.DELETE_HOUSE_TABLE_NAME,
-                        null));
-    }
-
-    public void updateName(House house) {
-        db.execSQL("UPDATE " +
-                        HouseEntry.HOUSE_TABLE_NAME + " SET " +
-                        HouseEntry.COLUMN_NAME_NAME + " = ?" +
-                        " WHERE " +
-                        HouseEntry.COLUMN_NAME_LOCAL_ID + " = ?",
-                new Object[]{house.getHouseName(), house.getHouseLocalId()});
-    }
-
     public HouseCursor findAll() {
         return new HouseCursor(
                 db.rawQuery("SELECT * FROM " + HouseEntry.HOUSE_TABLE_NAME,
@@ -125,19 +107,34 @@ public class HouseSQLiteRepository {
                         new String[]{Integer.toString(houseLocalId)}));
     }
 
-    //// TODO: 24/02/2016  Add snapshots and users
     public void update(House house) {
         db.execSQL("UPDATE " +HouseEntry.HOUSE_TABLE_NAME
                         + " SET "
                         +HouseEntry.COLUMN_NAME_ID+ " = ?"+COMMA_SEP
                         +HouseEntry.COLUMN_NAME_NAME+ " = ?"+COMMA_SEP
                         +HouseEntry.COLUMN_NAME_ID_ADMIN+ " = ?"+COMMA_SEP
-                        +HouseEntry.COLUMN_NAME_CREATE_TIME+ " = ?"
+                        +HouseEntry.COLUMN_NAME_SNAPSHOT+ " = ?"+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_SNAPSHOT_USER+ " = ?"+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_CREATE_TIME+ " = ?"+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_LAST_SYNC+ " = "
+                        +CURRENT_TIMESTAMP
                         + " WHERE "
                         +HouseEntry.COLUMN_NAME_LOCAL_ID+ " = ?;",
                 new Object[]{house.getHouseId(), house.getHouseName()
-                        , house.getAdminId(), house.getCreateTime()
+                        , house.getAdminId(), house.getSnapShot()
+                        , house.getSnapShotUser() ,house.getCreateTime()
                         , house.getHouseLocalId()});
+    }
+
+    public void updateName(House house) {
+        db.execSQL("UPDATE " +
+                        HouseEntry.HOUSE_TABLE_NAME + " SET " +
+                        HouseEntry.COLUMN_NAME_NAME + " = ?" +
+                        " WHERE " +
+                        HouseEntry.COLUMN_NAME_LOCAL_ID + " = ?",
+                new Object[]{house.getHouseName(), house.getHouseLocalId()});
+
+
     }
 
     public void insertUser(int houseId, int userId) {
@@ -148,6 +145,58 @@ public class HouseSQLiteRepository {
                         + ") " +
                         "VALUES(?, ?)",
                 new Object[]{houseId, userId});
+    }
+
+
+    public void setDeleted(int houseId){
+        db.execSQL("DELETE FROM " + HouseEntry.DELETE_HOUSE_TABLE_NAME + " WHERE "
+                        + HouseEntry.COLUMN_NAME_ID + " = ?",
+                new Object[]{houseId});
+    }
+
+    public HouseCursor getAllDeleted(){
+        return new HouseCursor(
+                db.rawQuery("SELECT "+ HouseEntry.COLUMN_NAME_ID
+                                +" FROM " + HouseEntry.DELETE_HOUSE_TABLE_NAME,
+                        null));
+    }
+
+    public void insertUpdated(int houseId, String field){
+        db.execSQL("INSERT OR IGNORE INTO " +
+                        HouseEntry.UPDATE_HOUSE_TABLE_NAME + "("
+                        +HouseEntry.COLUMN_NAME_ID+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_FIELD
+                        + ") " +
+                        "VALUES(?,?)",
+                new Object[]{houseId, field});
+    }
+
+    public void setUpdated(int houseId, String field){
+        db.execSQL("DELETE FROM " +
+                        HouseEntry.UPDATE_HOUSE_TABLE_NAME + " WHERE "
+                        +HouseEntry.COLUMN_NAME_ID + " = ? AND "
+                        +HouseEntry.COLUMN_NAME_FIELD + " = ?;",
+                new Object[]{houseId, field});
+    }
+
+    public HouseCursor getAllUpdated(){
+        return new HouseCursor(
+                db.rawQuery("SELECT "+ HouseEntry.COLUMN_NAME_ID+COMMA_SEP
+                                +HouseEntry.COLUMN_NAME_FIELD
+                                +" FROM " + HouseEntry.UPDATE_HOUSE_TABLE_NAME,
+                        null));
+    }
+
+
+    public void updateSnapshot(int houseId, String snapshop) {
+        db.execSQL("UPDATE " +
+                        HouseEntry.HOUSE_TABLE_NAME + " SET "
+                        +HouseEntry.COLUMN_NAME_SNAPSHOT + " = ?"+COMMA_SEP
+                        +HouseEntry.COLUMN_NAME_LAST_SYNC + " = "
+                        +CURRENT_TIMESTAMP
+                        +" WHERE " +
+                        HouseEntry.COLUMN_NAME_ID + " = ?",
+                new Object[]{snapshop, houseId});
     }
 }
 

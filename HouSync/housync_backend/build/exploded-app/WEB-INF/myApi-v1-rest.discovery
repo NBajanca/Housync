@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/DGbjsc98MVx4ny196qXkFngZsZs\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/2RYv-b98WKXbfngWb3LMJq4hcxo\"",
  "discoveryVersion": "v1",
  "id": "myApi:v1",
  "name": "myApi",
@@ -263,6 +263,40 @@
    },
    "response": {
     "$ref": "HouSyncUser"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "updateHouseData": {
+   "id": "myApi.updateHouseData",
+   "path": "housynchouse/{houseId}/{field}/{newValue}",
+   "httpMethod": "PUT",
+   "parameters": {
+    "field": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
+    "houseId": {
+     "type": "integer",
+     "required": true,
+     "format": "int32",
+     "location": "path"
+    },
+    "newValue": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "houseId",
+    "field",
+    "newValue"
+   ],
+   "response": {
+    "$ref": "HouSyncHouse"
    },
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"

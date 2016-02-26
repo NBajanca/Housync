@@ -47,6 +47,13 @@ public class HouseDBContract {
                     +HouseEntry.COLUMN_NAME_ID+INT_CHAR_TYPE+PRIMARY_KEY+NOT_NULL
                     +" )";
 
+    private static final String SQL_CREATE_UPDATE_HOUSE_TABLE =
+            "CREATE TABLE IF NOT EXISTS "+ HouseEntry.UPDATE_HOUSE_TABLE_NAME+" ("
+                    +HouseEntry.COLUMN_NAME_ID+INT_CHAR_TYPE+NOT_NULL+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_FIELD+VAR_CHAR_TYPE+NOT_NULL+COMMA_SEP
+                    + PRIMARY_KEY + " ("+HouseEntry.COLUMN_NAME_ID+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_FIELD+") )";
+
 
     public static SQLiteDatabase getWritableDatabase(Context context){
         return new HouseDBHelper(context).getWritableDatabase();
@@ -73,6 +80,9 @@ public class HouseDBContract {
         public static final String COLUMN_NAME_HOUSE_ID = "house_id";
 
         public static final String DELETE_HOUSE_TABLE_NAME = "delete_house";
+
+        public static final String UPDATE_HOUSE_TABLE_NAME = "update_house";
+        public static final String COLUMN_NAME_FIELD = "field";
     }
 
     private static class HouseDBHelper extends SQLiteOpenHelper {
@@ -87,6 +97,7 @@ public class HouseDBContract {
             db.execSQL(SQL_CREATE_HOUSE_TABLE);
             db.execSQL(SQL_CREATE_USER_HOUSE_TABLE);
             db.execSQL(SQL_CREATE_DELETE_HOUSE_TABLE);
+            db.execSQL(SQL_CREATE_UPDATE_HOUSE_TABLE);
         }
 
         @Override

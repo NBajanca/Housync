@@ -350,6 +350,30 @@ public class MyEndpoint {
 
     }
 
+    @ApiMethod(name = "updateHouseData")
+    public HouSyncHouse updateHouseData(@Named("houseId")int houseId, @Named("field") String field, @Named("newValue") String newValue){
+        HouSyncHouse response = null;
+
+        try {
+            String url = getDBUrl(HOUSE_DB);
+            Connection connection = DriverManager.getConnection(url);
+            try {
+                updateHouseData(houseId, field, newValue, connection);
+                response = getHouseData(houseId, connection);
+
+            }finally {
+                connection.close();
+            }
+        } catch (ClassNotFoundException e) {
+            response = getErrorResponse (e, -1);
+        } catch (SQLException e) {
+            response = getErrorResponse (e, -2);
+        }
+
+        return response;
+    }
+
+
 
     private String getDBUrl(int db) throws ClassNotFoundException {
         String url = null;
@@ -490,6 +514,22 @@ public class MyEndpoint {
         PreparedStatement stmt = connection.prepareStatement(statement);
         stmt.setInt(1, houseId);
         stmt.execute();
+    }
+
+    private void updateHouseData(int houseId, String field, String newValue, Connection connection) throws SQLException {
+        PreparedStatement stmt = null;
+        String statement;
+
+        switch (field){
+            case("name"):
+                statement = "UPDATE house " +
+                        "SET name = ? " +
+                        "WHERE id = ?;";
+                stmt = connection.prepareStatement(statement);
+                stmt.setString(1, newValue);
+                stmt.setInt(2, houseId);
+        }
+        stmt.executeUpdate();
     }
 
     private void insertUserInHouse(int houseId, int userId, Connection connection) throws SQLException {

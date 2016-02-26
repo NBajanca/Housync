@@ -67,6 +67,12 @@ public class HouseCursor extends CursorWrapper{
                         HouseEntry.COLUMN_NAME_LAST_SYNC));
     }
 
+    public String getField() {
+        return getString(
+                getColumnIndex(HouseDBContract.
+                        HouseEntry.COLUMN_NAME_FIELD));
+    }
+
     public House getHouse(){
         int houseLocalId = getLocalId();
         int houseId = getId();
@@ -88,7 +94,6 @@ public class HouseCursor extends CursorWrapper{
 
         return response;
     }
-
 
 
 

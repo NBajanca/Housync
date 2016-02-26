@@ -37,7 +37,7 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
         this.housesList =  new ArrayList<>(housesList);
     }
 
-    private void removeItem(House item) {
+    public void removeItem(House item) {
         int position = getItemPosition(item);
         housesList.remove(position);
         houseService.delete(item);
@@ -46,6 +46,14 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
             notifyDataSetChanged();
         }else
             notifyItemRemoved(position);
+    }
+
+    public void updateItem(House item) {
+        int position = getItemPosition(item);
+        housesList.remove(position);
+        housesList.add(position, item);
+
+        notifyItemChanged(position);
     }
 
     public House getItem(int position) {
@@ -85,14 +93,22 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
         RecyclerView.ViewHolder viewHolder = holder;
 
         holder.vName.setText(item.getHouseName());
+
+        if(item.getHouseId() != 0){
+            holder.vLastSync.setText(item.getLastSync());
+        }
     }
+
+
 
     public static class HouseRecyclerViewHolder extends RecyclerView.ViewHolder{
         protected TextView vName;
+        protected TextView vLastSync;
 
         public HouseRecyclerViewHolder(View itemView) {
             super(itemView);
             vName = (TextView) itemView.findViewById(R.id.recycler_item_house_name);
+            vLastSync = (TextView) itemView.findViewById(R.id.recycler_item_house_last_sync);
         }
 
 

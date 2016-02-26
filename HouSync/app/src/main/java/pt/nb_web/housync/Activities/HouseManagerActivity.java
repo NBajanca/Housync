@@ -111,7 +111,9 @@ public class HouseManagerActivity extends AppCompatActivity
         }else if(id == R.id.action_update){
             return true;
         }else if(id == R.id.action_edit){
-            return true;
+            Intent intent = new Intent(this , EditHouseActivity.class);
+            intent.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, id);
+            startActivityForResult(intent, Commons.HOUSE_EDIT_ACTIVIY_REQUEST);
         }else if(id == R.id.action_delete){
             onHouseDeleted(houseDetailsFragment.getHouseLocalId());
         }
@@ -154,6 +156,13 @@ public class HouseManagerActivity extends AppCompatActivity
                 else deleteHouse(houseLocalId);
             }
 
+        }else if(requestCode == Commons.HOUSE_EDIT_ACTIVIY_REQUEST && resultCode == RESULT_OK){
+            int result = data.getIntExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
+            if (result == Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE) {
+                int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
+                if (houseLocalId == Commons.NO_EXTRA) return;
+                else updateHouse(houseLocalId);
+            }
         }
 
     }
@@ -169,15 +178,7 @@ public class HouseManagerActivity extends AppCompatActivity
     @Override
     public void onItemSelected(int id) {
         if (mTwoPane) {
-            Bundle arguments = new Bundle();
-            arguments.putInt(Commons.HOUSE_LOCAL_ID_PARAMETER, id);
-
-            houseDetailsFragment = new HouseDetailsActivityFragment();
-            houseDetailsFragment.setArguments(arguments);
-
-            getSupportFragmentManager().beginTransaction().replace(
-                    R.id.fragment_house_details, houseDetailsFragment).commit();
-            invalidateOptionsMenu();
+            createTabletFragment(id);
         } else {
             Intent intent = new Intent(this , HouseDetailsActivity.class);
             intent.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, id);
@@ -198,6 +199,8 @@ public class HouseManagerActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction().replace(
                 R.id.fragment_house_details, new HouseDetailsActivityFragment()).commit();
     }
+
+
 
     private void addHouse(int houseLocalId) {
         HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
@@ -235,13 +238,7 @@ public class HouseManagerActivity extends AppCompatActivity
                             HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
                                     ((RecyclerView)findViewById(R.id.house_manager_view)).getAdapter();
 
-                            int positionRecycler = houseRecyclerAdapter.getItemPosition(house);
-                            houseService.delete(house);
-
-                            List<House> housesList = houseService.getAllItems();
-                            houseRecyclerAdapter.updateList(housesList);
-
-                            houseRecyclerAdapter.notifyItemRemoved(positionRecycler);
+                            houseRecyclerAdapter.removeItem(house);
 
                             if (house.getHouseId() > 0){
                                 deleteHouseAsyncTask = new DeleteHouseAsyncTask(getBaseContext()).execute(house);
@@ -254,6 +251,35 @@ public class HouseManagerActivity extends AppCompatActivity
             Log.d("HouseManager.deleteH", "House not found: " + Integer.toString(houseLocalId));
             e.printStackTrace();
         }
+    }
+
+    private void updateHouse(int houseLocalId) {
+        try {
+            House house = houseService.getHouse(houseLocalId);
+            HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
+                    ((RecyclerView)findViewById(R.id.house_manager_view)).getAdapter();
+
+            houseRecyclerAdapter.updateItem(house);
+        } catch (HouseNotFoundException e) {
+            Log.d("HouseManager.updateH", "House not found: " + Integer.toString(houseLocalId));
+            e.printStackTrace();
+            return;
+        }
+
+        if(mTwoPane)
+            createTabletFragment(houseLocalId);
+    }
+
+    private void createTabletFragment(int id) {
+        Bundle arguments = new Bundle();
+        arguments.putInt(Commons.HOUSE_LOCAL_ID_PARAMETER, id);
+
+        houseDetailsFragment = new HouseDetailsActivityFragment();
+        houseDetailsFragment.setArguments(arguments);
+
+        getSupportFragmentManager().beginTransaction().replace(
+                R.id.fragment_house_details, houseDetailsFragment).commit();
+        invalidateOptionsMenu();
     }
 
     @Override

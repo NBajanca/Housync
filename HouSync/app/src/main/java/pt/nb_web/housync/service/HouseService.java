@@ -3,12 +3,14 @@ package pt.nb_web.housync.service;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.Log;
+import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import pt.nb_web.housync.R;
 import pt.nb_web.housync.data.house.HouseCursor;
+import pt.nb_web.housync.data.house.HouseDBContract;
 import pt.nb_web.housync.data.house.HouseSQLiteRepository;
 import pt.nb_web.housync.exception.HouseNotFoundException;
 import pt.nb_web.housync.model.House;
@@ -65,7 +67,9 @@ public class HouseService {
         return repository.addNew(item);
     }
 
-    public void add(House item){ repository.add(item);}
+    public void add(House item){
+        repository.add(item);
+    }
 
     public void delete(House item){ repository.delete(item);}
 
@@ -92,6 +96,31 @@ public class HouseService {
 
     public void update(House house) {
         repository.update(house);
+
+    }
+
+    public void updateName(House house) {
+        repository.updateName(house);
+        if(house.getHouseId() > 0){
+            repository.insertUpdated(house.getHouseId(), HouseDBContract.HouseEntry.COLUMN_NAME_NAME);
+        }
+    }
+
+    public void setUpdated(Pair<House, String> houseAndFieldUpdated, String snapshop){
+        repository.setUpdated(houseAndFieldUpdated.first.getHouseId(), houseAndFieldUpdated.second);
+        repository.updateSnapshot(houseAndFieldUpdated.first.getHouseId(), snapshop);
+    }
+
+    public List<Pair<Integer, String>> getAllUpdated(){
+        List<Pair<Integer, String>> updatedHouses = new ArrayList<>();
+        HouseCursor cursor = repository.getAllUpdated();
+
+        while (cursor.moveToNext()) {
+            updatedHouses.add(new Pair<Integer, String>(cursor.getId(), cursor.getField()));
+        }
+
+        cursor.close();
+        return updatedHouses;
     }
 
     public void insertUser(int houseID, int userID){

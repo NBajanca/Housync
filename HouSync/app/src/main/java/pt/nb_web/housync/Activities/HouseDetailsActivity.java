@@ -66,13 +66,51 @@ public class HouseDetailsActivity extends AppCompatActivity
         if(id == R.id.action_update){
             return true;
         }else if(id == R.id.action_edit){
-            return true;
+            Intent intent = new Intent(this , EditHouseActivity.class);
+            intent.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, fragment.getHouseLocalId());
+            startActivityForResult(intent, Commons.HOUSE_EDIT_ACTIVIY_REQUEST);
         }else if(id == R.id.action_delete){
             deleteHouse();
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == Commons.HOUSE_EDIT_ACTIVIY_REQUEST && resultCode == RESULT_OK){
+            int result = data.getIntExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
+            if (result == Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE) {
+                int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
+                if (houseLocalId == Commons.NO_EXTRA) return;
+                else updateHouse(houseLocalId);
+            }
+        }
+
+    }
+
+    private void updateHouse(int houseLocalId) {
+        Bundle arguments = new Bundle();
+        arguments.putInt(Commons.HOUSE_LOCAL_ID_PARAMETER, houseLocalId);
+
+        fragment = new HouseDetailsActivityFragment();
+        fragment.setArguments(arguments);
+
+        getSupportFragmentManager().beginTransaction().replace(
+                R.id.house_details_fragment, fragment).commit();
+
+        Intent data = new Intent();
+        data.putExtra(Commons.HOUSE_EDIT_ACTIVIY_PARAMETER, Commons.HOUSE_EDIT_ACTIVIY_RESULT_EDIT);
+        data.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, houseLocalId);
+
+        if (getParent() == null) {
+            setResult(Activity.RESULT_OK, data);
+        } else {
+            getParent().setResult(Activity.RESULT_OK, data);
+        }
+    }
+
 
     private void deleteHouse(){
         Intent data = new Intent();
