@@ -37,7 +37,7 @@ public class HouseManagerActivity extends AppCompatActivity
         implements HouseManagerActivityFragment.Listener, HouseDetailsActivityFragment.Listener{
     private DrawerHelper drawerHelper;
     private HouseService houseService;
-    private AsyncTask<House, Void, Void> deleteHouseAsyncTask;
+    private AsyncTask<Integer, Void, Void> deleteHouseAsyncTask;
     private AsyncTask<House, Void, Void> addHouseAsyncTask;
 
     private HouseDetailsActivityFragment houseDetailsFragment = null;
@@ -238,10 +238,12 @@ public class HouseManagerActivity extends AppCompatActivity
                             HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
                                     ((RecyclerView)findViewById(R.id.house_manager_view)).getAdapter();
 
+                            houseService.delete(house);
                             houseRecyclerAdapter.removeItem(house);
 
+
                             if (house.getHouseId() > 0){
-                                deleteHouseAsyncTask = new DeleteHouseAsyncTask(getBaseContext()).execute(house);
+                                deleteHouseAsyncTask = new DeleteHouseAsyncTask(getBaseContext()).execute(house.getHouseId());
                             }
                         }
                     })

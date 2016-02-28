@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/2RYv-b98WKXbfngWb3LMJq4hcxo\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/XhIXsH4rPQK0JpyQHwYeQsCbE-k\"",
  "discoveryVersion": "v1",
  "id": "myApi:v1",
  "name": "myApi",
@@ -140,6 +140,35 @@
   }
  },
  "methods": {
+  "addUserToHouse": {
+   "id": "myApi.addUserToHouse",
+   "path": "addUserToHouse/{houseId}/{user_id}",
+   "httpMethod": "POST",
+   "parameters": {
+    "houseId": {
+     "type": "integer",
+     "required": true,
+     "format": "int32",
+     "location": "path"
+    },
+    "user_id": {
+     "type": "integer",
+     "required": true,
+     "format": "int32",
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "houseId",
+    "user_id"
+   ],
+   "response": {
+    "$ref": "HouSyncHouse"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
   "createHouse": {
    "id": "myApi.createHouse",
    "path": "createHouse",

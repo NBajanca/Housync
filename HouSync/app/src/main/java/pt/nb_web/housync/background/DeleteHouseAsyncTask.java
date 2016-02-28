@@ -17,7 +17,7 @@ import pt.nb_web.housync.utils.NetworkHelper;
 /**
  * Created by Nuno on 23/02/2016.
  */
-public class DeleteHouseAsyncTask extends AsyncTask<House, Void, Void> {
+public class DeleteHouseAsyncTask extends AsyncTask<Integer, Void, Void> {
     private final Context context;
     private static MyApi myApiService = null;
     private HouseService houseService;
@@ -28,8 +28,8 @@ public class DeleteHouseAsyncTask extends AsyncTask<House, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(House... params) {
-        House houseToDelete = params[0];
+    protected Void doInBackground(Integer... params) {
+        int houseToDeleteId = params[0];
 
         if(myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
@@ -39,8 +39,8 @@ public class DeleteHouseAsyncTask extends AsyncTask<House, Void, Void> {
         }
 
         try {
-            if (deleteHouse(context, myApiService, houseToDelete.getHouseId()))
-                houseService.setDeleted(houseToDelete.getHouseId());
+            if (deleteHouse(context, myApiService, houseToDeleteId))
+                houseService.setDeleted(houseToDeleteId);
         } catch (IOException e) {
             e.printStackTrace();
         }

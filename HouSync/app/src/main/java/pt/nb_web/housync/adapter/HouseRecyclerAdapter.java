@@ -25,12 +25,9 @@ import pt.nb_web.housync.service.HouseService;
  */
 public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdapter.HouseRecyclerViewHolder>{
     private List<House> housesList;
-    private HouseService houseService;
-
-    public final static String EXTRA_HOUSE = "pt.nb_web.housync.HOUSE";
 
     public HouseRecyclerAdapter(List<House> housesList){
-        this.housesList =  new ArrayList<>(housesList);
+        updateList(housesList);
     }
 
     public void updateList(List<House> housesList){
@@ -40,7 +37,6 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
     public void removeItem(House item) {
         int position = getItemPosition(item);
         housesList.remove(position);
-        houseService.delete(item);
 
         if (position == 0 && housesList.size() == 0) {
             notifyDataSetChanged();
@@ -65,7 +61,6 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
             if (house.equals(item)){
                 return housesList.indexOf(house);
             }
-
         }
         return -1;
     }
@@ -78,7 +73,6 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
     @Override
     public HouseRecyclerAdapter.HouseRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        houseService = HouseService.getInstance(context);
 
         View itemView = LayoutInflater
                 .from(context)
@@ -98,7 +92,6 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
             holder.vLastSync.setText(item.getLastSync());
         }
     }
-
 
 
     public static class HouseRecyclerViewHolder extends RecyclerView.ViewHolder{

@@ -29,7 +29,7 @@ public class HouseManagerActivityFragment extends Fragment {
     private HouseRecyclerAdapter houseRecyclerAdapter;
 
     private Listener listener;
-    private AsyncTask<List<House>, Void, List<House>> updateListAsyncTask;
+    private AsyncTask<List<House>, Void, Void> updateListAsyncTask;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

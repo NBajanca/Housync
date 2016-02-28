@@ -51,10 +51,12 @@ public class LogInActivity extends AppCompatActivity{
 
         if (requestCode == googleAccount.getRcSignIn()) {
             googleAccount.onLogInActivityResult(requestCode, resultCode, data);
-            new LogInAsyncTask(this).execute((SignInAccount) googleAccount);
+            if (googleAccount.getGoogleSignInAccount() != null)
+                new LogInAsyncTask(this).execute((SignInAccount) googleAccount);
         }else{
             facebookAccount.onLogInActivityResult(requestCode, resultCode, data);
-            new LogInAsyncTask(this).execute((SignInAccount) facebookAccount);
+            if (facebookAccount.getAccessToken() != null)
+                new LogInAsyncTask(this).execute((SignInAccount) facebookAccount);
         }
     }
 

@@ -26,31 +26,47 @@ import pt.nb_web.housync.utils.ProgressDialogHelper;
 /**
  * Created by Nuno on 23/02/2016.
  */
-public class UpdateHouseListAsyncTask extends AsyncTask<List<House>, Void, List<House>> {
+public class UpdateHouseListAsyncTask extends AsyncTask<List<House>, Void, Void> {
+
     private final int userId;
     private final View view;
-    private final Context context;
+    private final Context appContext;
+
     private static MyApi myApiService = null;
+    private HouseService houseService;
+
     private List<House> localHouses;
     private List<House> localHousesNotOnline;
-    private HouseService houseService;
+    private List<House> onlineHousesNotLocal;
     private List<House> deletedHouses;
+    private List<House> housesToUpdate;
+    private List<House> housesToUpdateUsers;
+    private List<House> housesToAddOnline;
+
+    private List<Integer> housesDeletedIds;
+    int housesAdded = 0;
+
+
 
     public UpdateHouseListAsyncTask(View view, int userId) {
         this.view = view;
-        this.context = view.getContext();
+        this.appContext = view.getContext().getApplicationContext();
         this.userId = userId;
         houseService = HouseService.getInstance(view.getContext());
+
+        onlineHousesNotLocal = new ArrayList<>();
+        housesToAddOnline = new ArrayList<>();
+        deletedHouses = new ArrayList<>();
+        housesToUpdate = new ArrayList<>();
+        housesToUpdateUsers = new ArrayList<>();
+        housesDeletedIds = houseService.getAllDeleted();
 
     }
 
     @Override
-    protected List<House> doInBackground(List<House>... params) {
+    protected Void doInBackground(List<House>... params) {
         localHouses = params[0];
         localHousesNotOnline = new ArrayList<>(localHouses);
-        List<House> onlineHousesnotLocal = new ArrayList<>();
-        List<House> housesToAddOnline = new ArrayList<>();
-        deletedHouses = new ArrayList<>();
 
         setAdminId(localHouses);
 
@@ -62,103 +78,73 @@ public class UpdateHouseListAsyncTask extends AsyncTask<List<House>, Void, List<
         }
 
         try {
-            deleteHouses();
-
             List<HouSyncHouse> onlineHousesList = myApiService.getAllHouses(userId).execute().getItems();
             for (HouSyncHouse onlineHouse: onlineHousesList) {
-                boolean exists = false;
-                for (House localHouse: localHouses) {
-                    if (localHouse.getHouseId() == onlineHouse.getHouseId()){
-                        localHousesNotOnline.remove(localHouse);
-                        exists = true;
-                        break;
-                    }
+                House localHouse = getHouseLocally(onlineHouse);
+                if (localHouse != null){
+                    checkIfHouseIsUpdated(onlineHouse, localHouse);
+                    checkIfHouseUsersAreUpdated(onlineHouse, localHouse);
+                }else {
+                    addHouseLocally(onlineHouse);
                 }
 
-                if (!exists){
-                    onlineHouse = myApiService.getHouseData(onlineHouse.getHouseId()).execute();
-                    House newHouse = House.getHouseFromHouSyncHouse(onlineHouse);
-                    onlineHousesnotLocal.add(newHouse);
-                }
             }
-            for (House house: localHousesNotOnline){
-                //House existed online
-                if(house.getHouseId() != 0) {
-                    houseService.delete(house);
-                    deletedHouses.add(house);
-                }else
-                    housesToAddOnline.add(house);
-            }
+            processLocalHousesNotOnline();
 
-            for (House house: housesToAddOnline){
-                AddHouseAsyncTask.createHouse(context, myApiService, house);
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-        return onlineHousesnotLocal;
+        return null;
     }
 
-    @Override
-    protected void onPostExecute(List<House> result) {
-        super.onPostExecute(result);
+    private House getHouseLocally(HouSyncHouse onlineHouse) {
+        for (House localHouse: localHouses) {
+            if (localHouse.getHouseId() == onlineHouse.getHouseId()){
+                localHousesNotOnline.remove(localHouse);
+                return localHouse;
+            }
+        }
+        return null;
+    }
 
-        int housesAdded = 0;
-        int housesDeleted = deletedHouses.size();
-        List<Integer> housesDeletedIds = houseService.getAllDeleted();
+    private void processLocalHousesNotOnline() {
+        for (House house: localHousesNotOnline){
+            //House existed online
+            if(house.getHouseId() != 0) {
+                houseService.delete(house);
+                deletedHouses.add(house);
+            }else
+                housesToAddOnline.add(house);
+        }
+    }
 
-        OUTER_LOOP:
-        for (House house: result) {
-            if (housesDeletedIds.size() != 0){
-                for (int id :housesDeletedIds) {
-                    if (house.getHouseId() == id){
-                        continue OUTER_LOOP;
-                    }
+    private void addHouseLocally(HouSyncHouse onlineHouse) throws IOException {
+        onlineHouse = myApiService.getHouseData(onlineHouse.getHouseId()).execute();
+        House newHouse = House.getHouseFromHouSyncHouse(onlineHouse);
+
+        if (housesDeletedIds.size() != 0){
+            for (int id :housesDeletedIds) {
+                if (newHouse.getHouseId() == id){
+                    return;
                 }
             }
-            houseService.add(house);
-            housesAdded ++;
         }
+        houseService.add(newHouse);
+        housesAdded ++;
+    }
 
-        if (!isCancelled()){
-            ProgressDialogHelper.show(view.getContext(), "Updating Houses...");
-            HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
-                    ((RecyclerView) view.findViewById(R.id.house_manager_view)).getAdapter();
 
-            if (housesDeleted >0){
 
-                for (House deletedHouse: deletedHouses){
-                    int position = houseRecyclerAdapter.getItemPosition(deletedHouse);
-                    houseRecyclerAdapter.notifyItemRemoved(position);
-                }
-            }
-
-            if (housesDeleted >0 || housesAdded >0) {
-                List<House> housesList = houseService.getAllItems();
-                houseRecyclerAdapter.updateList(housesList);
-            }
-
-            if (housesAdded != 0) {
-                houseRecyclerAdapter.notifyItemRangeInserted(localHouses.size() - housesDeleted, housesAdded);
-            }
-
-            ProgressDialogHelper.hide();
-        }else{
-            Log.d("UpdateHouseListAsync", "View offline");
+    private void checkIfHouseUsersAreUpdated(HouSyncHouse onlineHouse, House localHouse) {
+        if (onlineHouse.getSnapShotUser() != localHouse.getSnapShotUser()){
+            housesToUpdateUsers.add(localHouse);
         }
+    }
 
-        if(housesAdded >0  && housesDeleted>0){
-            Toast.makeText(view.getContext(),
-                    Integer.toString(housesAdded) + " House(s) Added and " +
-                    Integer.toString(housesDeleted) + " House(s) Deleted",Toast.LENGTH_LONG).show();
-        }else if(housesAdded >0){
-            Toast.makeText(view.getContext(),
-                    Integer.toString(housesAdded) + " House(s) Added",Toast.LENGTH_LONG).show();
-        }else if(housesDeleted>0){
-            Toast.makeText(view.getContext(),
-                    Integer.toString(housesDeleted) + " House(s) Deleted",Toast.LENGTH_LONG).show();
+    private void checkIfHouseIsUpdated(HouSyncHouse onlineHouse, House localHouse) {
+        if (onlineHouse.getSnapShot() != localHouse.getSnapShot()){
+            housesToUpdate.add(localHouse);
         }
     }
 
@@ -172,14 +158,61 @@ public class UpdateHouseListAsyncTask extends AsyncTask<List<House>, Void, List<
         }
     }
 
-    private void deleteHouses() throws IOException {
-        List<Integer> housesDeletedIds = houseService.getAllDeleted();
+    @Override
+    protected void onPostExecute(Void result) {
+        super.onPostExecute(result);
 
-        for (int id :housesDeletedIds) {
-            if (DeleteHouseAsyncTask.deleteHouse(context, myApiService, id))
-                houseService.setDeleted(id);
+
+        int housesDeleted = deletedHouses.size();
+
+        if (!isCancelled()){
+            updateHouseUI(housesDeleted);
+            presentChanges(housesDeleted);
+        }else{
+            Log.d("UpdateHouseListAsync", "View offline");
+        }
+
+        for (House house: housesToAddOnline) {
+            new AddHouseAsyncTask(appContext).execute(house);
+        }
+
+        for (int id: housesDeletedIds){
+            new DeleteHouseAsyncTask(appContext).execute(id);
         }
 
 
     }
+
+    private void presentChanges(int housesDeleted) {
+        if(housesAdded >0  && housesDeleted>0){
+            Toast.makeText(view.getContext(),
+                    Integer.toString(housesAdded) + " House(s) Added and " +
+                            Integer.toString(housesDeleted) + " House(s) Deleted",Toast.LENGTH_LONG).show();
+        }else if(housesAdded >0){
+            Toast.makeText(view.getContext(),
+                    Integer.toString(housesAdded) + " House(s) Added",Toast.LENGTH_LONG).show();
+        }else if(housesDeleted>0){
+            Toast.makeText(view.getContext(),
+                    Integer.toString(housesDeleted) + " House(s) Deleted",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void updateHouseUI(int housesDeleted) {
+        ProgressDialogHelper.show(view.getContext(), "Updating Houses...");
+        HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
+                ((RecyclerView) view.findViewById(R.id.house_manager_view)).getAdapter();
+
+        for (House deletedHouse: deletedHouses){
+            houseRecyclerAdapter.removeItem(deletedHouse);
+        }
+
+        if (housesAdded != 0) {
+            List<House> housesList = houseService.getAllItems();
+            houseRecyclerAdapter.updateList(housesList);
+            houseRecyclerAdapter.notifyItemRangeInserted(localHouses.size() - housesDeleted, housesAdded);
+        }
+
+        ProgressDialogHelper.hide();
+    }
+
 }

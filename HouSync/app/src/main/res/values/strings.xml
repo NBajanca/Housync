@@ -83,5 +83,6 @@
     <string name="delete_house_alert_title">Delete %1$s?</string>
     <string name="delete_house_alert_text">Are you sure you want to delete this house?</string>
     <string name="fragment_no_house_title">Select a House</string>
+    <string name="hosts_title">The hosts</string>
 
 </resources>

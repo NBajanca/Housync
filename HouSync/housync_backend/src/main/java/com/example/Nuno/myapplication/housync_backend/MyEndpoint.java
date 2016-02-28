@@ -141,8 +141,6 @@ public class MyEndpoint {
         return response;
     }
 
-
-
     /**
      * Process Facebook Sign In
      *
@@ -319,7 +317,7 @@ public class MyEndpoint {
             String url = getDBUrl(HOUSE_DB);
             Connection connection = DriverManager.getConnection(url);
             try {
-                String statement = "SELECT id " +
+                String statement = "SELECT id, snapshot, snapshot_user " +
                         "FROM house inner join user_house " +
                         "WHERE id = id_house " +
                         "AND id_user = ?";
@@ -329,7 +327,11 @@ public class MyEndpoint {
 
                 while (resultSet.next()){
                     int houseId = resultSet.getInt("id");
+                    String snapshot = resultSet.getString("snapshot");
+                    String snapshotUser = resultSet.getString("snapshot_user");
                     HouSyncHouse house = new HouSyncHouse(houseId);
+                    house.setSnapShot(snapshot);
+                    house.setSnapShotUser(snapshotUser);
                     houSyncHouses.add(house);
                 }
 
@@ -361,6 +363,27 @@ public class MyEndpoint {
                 updateHouseData(houseId, field, newValue, connection);
                 response = getHouseData(houseId, connection);
 
+            }finally {
+                connection.close();
+            }
+        } catch (ClassNotFoundException e) {
+            response = getErrorResponse (e, -1);
+        } catch (SQLException e) {
+            response = getErrorResponse (e, -2);
+        }
+
+        return response;
+    }
+
+    @ApiMethod(name = "addUserToHouse")
+    public HouSyncHouse addUserToHouse(@Named("houseId") int houseId, @Named("user_id") int userId){
+        HouSyncHouse response = null;
+
+        try {
+            String url = getDBUrl(HOUSE_DB);
+            Connection connection = DriverManager.getConnection(url);
+            try {
+                insertUserInHouse(houseId, userId, connection);
             }finally {
                 connection.close();
             }
