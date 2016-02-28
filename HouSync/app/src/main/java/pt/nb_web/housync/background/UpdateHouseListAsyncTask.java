@@ -37,7 +37,6 @@ public class UpdateHouseListAsyncTask extends AsyncTask<List<House>, Void, Void>
 
     private List<House> localHouses;
     private List<House> localHousesNotOnline;
-    private List<House> onlineHousesNotLocal;
     private List<House> deletedHouses;
     private List<House> housesToUpdate;
     private List<House> housesToUpdateUsers;
@@ -53,8 +52,6 @@ public class UpdateHouseListAsyncTask extends AsyncTask<List<House>, Void, Void>
         this.appContext = view.getContext().getApplicationContext();
         this.userId = userId;
         houseService = HouseService.getInstance(view.getContext());
-
-        onlineHousesNotLocal = new ArrayList<>();
         housesToAddOnline = new ArrayList<>();
         deletedHouses = new ArrayList<>();
         housesToUpdate = new ArrayList<>();
@@ -209,7 +206,6 @@ public class UpdateHouseListAsyncTask extends AsyncTask<List<House>, Void, Void>
         if (housesAdded != 0) {
             List<House> housesList = houseService.getAllItems();
             houseRecyclerAdapter.updateList(housesList);
-            houseRecyclerAdapter.notifyItemRangeInserted(localHouses.size() - housesDeleted, housesAdded);
         }
 
         ProgressDialogHelper.hide();

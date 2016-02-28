@@ -32,6 +32,7 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
 
     public void updateList(List<House> housesList){
         this.housesList =  new ArrayList<>(housesList);
+        notifyDataSetChanged();
     }
 
     public void removeItem(House item) {
@@ -42,6 +43,12 @@ public class HouseRecyclerAdapter extends RecyclerView.Adapter<HouseRecyclerAdap
             notifyDataSetChanged();
         }else
             notifyItemRemoved(position);
+    }
+
+    public void addItem(House item){
+        housesList.add(item);
+
+        notifyItemInserted(housesList.size());
     }
 
     public void updateItem(House item) {

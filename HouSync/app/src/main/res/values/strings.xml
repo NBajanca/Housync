@@ -15,17 +15,23 @@
     <string name="menu_house_selected">House</string>
     <string name="house_settings_menu_title">%s settings</string>
 
+        <!-- Delete house warning -->
+        <string name="delete_house_alert_title">Delete %1$s?</string>
+        <string name="delete_house_alert_text">Are you sure you want to delete this house?</string>
+
     <!-- House Details -->
     <string name="title_activity_house_details">House Details</string>
     <string name="action_update_house">Update (Sync)</string>
     <string name="action_edit_house">Edit</string>
     <string name="action_delete_house">Delete</string>
+    <string name="hosts_title">The hosts</string>
 
 
     <!-- Add House -->
     <string name="title_activity_add_house">Add new House</string>
     <string name="add_house_button">Add</string>
     <string name="add_house_name">Name</string>
+    <string name="house_name_mandatory">Please give a name to your house</string>
 
     <!-- Edit House -->
     <string name="title_activity_edit_house">Edit House</string>
@@ -80,9 +86,9 @@
     <string name="last_sync">Last sync: </string>
     <string name="never_sync">Never</string>
     <string name="sync">Sync</string>
-    <string name="delete_house_alert_title">Delete %1$s?</string>
-    <string name="delete_house_alert_text">Are you sure you want to delete this house?</string>
+
     <string name="fragment_no_house_title">Select a House</string>
-    <string name="hosts_title">The hosts</string>
+
+
 
 </resources>

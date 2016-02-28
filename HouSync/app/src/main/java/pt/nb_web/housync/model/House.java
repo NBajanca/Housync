@@ -18,6 +18,11 @@ public class House extends HouSyncHouse {
         setAdminId(id_admin);
     }
 
+    public House(String name) {
+        setHouseName(name);
+        setAdminId(0);
+    }
+
     public House(int houseLocalId) {
         setHouseLocalId(houseLocalId);
     }

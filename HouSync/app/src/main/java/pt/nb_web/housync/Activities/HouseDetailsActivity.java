@@ -44,8 +44,6 @@ public class HouseDetailsActivity extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().add(
                     R.id.house_details_fragment, fragment).commit();
         }
-
-
     }
 
     @Override
@@ -70,7 +68,7 @@ public class HouseDetailsActivity extends AppCompatActivity
             intent.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, fragment.getHouseLocalId());
             startActivityForResult(intent, Commons.HOUSE_EDIT_ACTIVIY_REQUEST);
         }else if(id == R.id.action_delete){
-            deleteHouse();
+            deleteHouse(fragment.getHouseLocalId());
         }
 
         return super.onOptionsItemSelected(item);
@@ -80,26 +78,21 @@ public class HouseDetailsActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if(requestCode == Commons.HOUSE_EDIT_ACTIVIY_REQUEST && resultCode == RESULT_OK){
-            int result = data.getIntExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
-            if (result == Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE) {
-                int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
-                if (houseLocalId == Commons.NO_EXTRA) return;
-                else updateHouse(houseLocalId);
+            int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
+            if (houseLocalId == Commons.NO_EXTRA) return;
+            int result = data.getIntExtra(Commons.HOUSE_EDIT_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
+            if (result == Commons.HOUSE_EDIT_ACTIVIY_RESULT_DELETE) {
+                deleteHouse(houseLocalId);
+            }else if (result == Commons.HOUSE_EDIT_ACTIVIY_RESULT_EDIT){
+                updateHouse(houseLocalId);
             }
         }
-
     }
 
     private void updateHouse(int houseLocalId) {
-        Bundle arguments = new Bundle();
-        arguments.putInt(Commons.HOUSE_LOCAL_ID_PARAMETER, houseLocalId);
+        fragment.updateHouse(houseLocalId);
 
-        fragment = new HouseDetailsActivityFragment();
-        fragment.setArguments(arguments);
-
-        getSupportFragmentManager().beginTransaction().replace(
-                R.id.house_details_fragment, fragment).commit();
-
+        //To assure than when return is pressed the Recycler View is updated
         Intent data = new Intent();
         data.putExtra(Commons.HOUSE_EDIT_ACTIVIY_PARAMETER, Commons.HOUSE_EDIT_ACTIVIY_RESULT_EDIT);
         data.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, houseLocalId);
@@ -112,10 +105,10 @@ public class HouseDetailsActivity extends AppCompatActivity
     }
 
 
-    private void deleteHouse(){
+    private void deleteHouse(int houseLocalId){
         Intent data = new Intent();
         data.putExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE);
-        data.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, fragment.getHouseLocalId());
+        data.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, houseLocalId);
 
         if (getParent() == null) {
             setResult(Activity.RESULT_OK, data);
@@ -127,6 +120,6 @@ public class HouseDetailsActivity extends AppCompatActivity
 
     @Override
     public void onHouseDeleted(int houseLocalId) {
-        deleteHouse();
+        deleteHouse(houseLocalId);
     }
 }

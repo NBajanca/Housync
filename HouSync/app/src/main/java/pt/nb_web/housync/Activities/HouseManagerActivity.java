@@ -141,27 +141,29 @@ public class HouseManagerActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == Commons.HOUSE_ADD_ACTIVIY_REQUEST){
-            int result = data.getIntExtra(Commons.HOUSE_ADD_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
-            if (result == Commons.HOUSE_ADD_ACTIVIY_RESULT_ADD){
-                int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
-                if (houseLocalId == Commons.NO_EXTRA) return;
-                else addHouse(houseLocalId);
-            }
-        }else if( requestCode == Commons.HOUSE_DETAILS_ACTIVIY_REQUEST){
-            int result = data.getIntExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
-            if (result == Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE){
-                int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
-                if (houseLocalId == Commons.NO_EXTRA) return;
-                else deleteHouse(houseLocalId);
-            }
+        if(resultCode == RESULT_OK) {
+            if (requestCode == Commons.HOUSE_ADD_ACTIVIY_REQUEST) {
+                int result = data.getIntExtra(Commons.HOUSE_ADD_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
+                if (result == Commons.HOUSE_ADD_ACTIVIY_RESULT_ADD) {
+                    int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
+                    if (houseLocalId == Commons.NO_EXTRA) return;
+                    else addHouse(houseLocalId);
+                }
+            } else if (requestCode == Commons.HOUSE_DETAILS_ACTIVIY_REQUEST) {
+                int result = data.getIntExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
+                if (result == Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE) {
+                    int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
+                    if (houseLocalId == Commons.NO_EXTRA) return;
+                    else deleteHouse(houseLocalId);
+                }
 
-        }else if(requestCode == Commons.HOUSE_EDIT_ACTIVIY_REQUEST && resultCode == RESULT_OK){
-            int result = data.getIntExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
-            if (result == Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE) {
-                int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
-                if (houseLocalId == Commons.NO_EXTRA) return;
-                else updateHouse(houseLocalId);
+            } else if (requestCode == Commons.HOUSE_EDIT_ACTIVIY_REQUEST && resultCode == RESULT_OK) {
+                int result = data.getIntExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
+                if (result == Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE) {
+                    int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
+                    if (houseLocalId == Commons.NO_EXTRA) return;
+                    else updateHouse(houseLocalId);
+                }
             }
         }
 
@@ -205,16 +207,12 @@ public class HouseManagerActivity extends AppCompatActivity
     private void addHouse(int houseLocalId) {
         HouseRecyclerAdapter houseRecyclerAdapter = (HouseRecyclerAdapter)
                 ((RecyclerView)findViewById(R.id.house_manager_view)).getAdapter();
-        List<House> housesList = houseService.getAllItems();
-
-        houseRecyclerAdapter.updateList(housesList);
-        houseRecyclerAdapter.notifyItemInserted(housesList.size());
 
         try {
-            House house = houseService.getHouse(houseLocalId);
-            addHouseAsyncTask = new AddHouseAsyncTask(getBaseContext()).execute(house);
+            House newHouse = houseService.getHouse(houseLocalId);
+            houseRecyclerAdapter.addItem(newHouse);
         } catch (HouseNotFoundException e) {
-            Log.d("HouseManager.addHouse", "House not found: " + Integer.toString(houseLocalId));
+            Log.d("HouseManagerA.add", "House not found: " + houseLocalId);
             e.printStackTrace();
         }
     }

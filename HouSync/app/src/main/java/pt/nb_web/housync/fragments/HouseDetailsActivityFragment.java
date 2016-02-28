@@ -34,18 +34,8 @@ public class HouseDetailsActivityFragment extends Fragment {
 
         if(houseLocalId >= 1){
             view = inflater.inflate(R.layout.fragment_house_details, container, false);
-            TextView nameTextView = (TextView) view.findViewById(R.id.house_fragment_house_name);
-            HouseService houseService = HouseService.getInstance(this.getContext());
             try {
-                house = houseService.getHouse(houseLocalId);
-
-                if (getActivity() instanceof HouseDetailsActivity){
-                    getActivity().setTitle(house.getHouseName());
-                    ((ViewGroup) nameTextView.getParent()).removeView(nameTextView);
-                }else{
-                    nameTextView.setText(house.getHouseName());
-                }
-
+                setViewFields(view, houseLocalId);
 
                 view.findViewById(R.id.delete_house).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -58,6 +48,7 @@ public class HouseDetailsActivityFragment extends Fragment {
                 e.printStackTrace();
                 return view;
             }
+
         }else{
             view = inflater.inflate(R.layout.fragment_no_house_details, container, false);
         }
@@ -90,6 +81,32 @@ public class HouseDetailsActivityFragment extends Fragment {
     public void setHouse(House house) {
         this.house = house;
     }
+
+    private void setViewFields(View view, final int houseLocalId) throws HouseNotFoundException {
+        TextView nameTextView = (TextView) view.findViewById(R.id.house_fragment_house_name);
+        HouseService houseService = HouseService.getInstance(this.getContext());
+
+        house = houseService.getHouse(houseLocalId);
+
+        if (getActivity() instanceof HouseDetailsActivity){
+            getActivity().setTitle(house.getHouseName());
+            if (nameTextView != null)
+                ((ViewGroup) nameTextView.getParent()).removeView(nameTextView);
+        }else{
+            nameTextView.setText(house.getHouseName());
+        }
+    }
+
+    public void updateHouse(int houseLocalId) {
+        try {
+            setViewFields(getView(), houseLocalId);
+        } catch (HouseNotFoundException e) {
+            Log.d("HouseDetailsFragmentUpd", "House not found: " + Integer.toString(houseLocalId));
+            e.printStackTrace();
+        }
+    }
+
+
 
     public interface Listener {
         public void onHouseDeleted(int houseLocalId);
