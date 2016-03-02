@@ -30,6 +30,10 @@ public class House extends HouSyncHouse {
         setHouseLocalId(houseLocalId);
     }
 
+    public House() {
+
+    }
+
     public int getHouseLocalId() {
         return houseLocalId;
     }

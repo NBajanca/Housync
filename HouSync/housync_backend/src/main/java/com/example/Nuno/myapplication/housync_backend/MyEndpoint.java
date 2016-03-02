@@ -254,14 +254,14 @@ public class MyEndpoint {
             Connection connection = DriverManager.getConnection(url);
             try {
                 response = createHouse(house.getHouseName(), house.getAdminId(), house.getCreateTime(),connection);
-
+                insertUserInHouse(response.getHouseId(), house.getAdminId(), connection);
             }finally {
                 connection.close();
             }
         } catch (ClassNotFoundException e) {
-            response = getErrorResponse (e, -1);
+            response = getErrorResponseHouse(e, -1);
         } catch (SQLException e) {
-            response = getErrorResponse (e, -2);
+            response = getErrorResponseHouse(e, -2);
         }
 
         return response;
@@ -288,7 +288,7 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "getHouseData")
-    public HouSyncHouse getHouseData(@Named("houseId")int houseId){
+     public HouSyncHouse getHouseData(@Named("houseId")int houseId){
         HouSyncHouse response = null;
 
         try {
@@ -301,9 +301,30 @@ public class MyEndpoint {
                 connection.close();
             }
         } catch (ClassNotFoundException e) {
-            response = getErrorResponse (e, -1);
+            response = getErrorResponseHouse(e, -1);
         } catch (SQLException e) {
-            response = getErrorResponse (e, -2);
+            response = getErrorResponseHouse(e, -2);
+        }
+
+        return response;
+    }
+
+    @ApiMethod(name = "getHouseUsers")
+    public List<HouSyncUser> getHouseUsers(@Named("houseId")int houseId){
+        List<HouSyncUser> response = new ArrayList<>();
+
+        try {
+            String url = getDBUrl(HOUSE_DB);
+            Connection connection = DriverManager.getConnection(url);
+            try {
+                response = getHouseUsers(houseId, connection);
+            }finally {
+                connection.close();
+            }
+        } catch (ClassNotFoundException e) {
+            response.add(getErrorResponseUser(e, -1));
+        } catch (SQLException e) {
+            response.add(getErrorResponseUser(e, -2));
         }
 
         return response;
@@ -339,11 +360,11 @@ public class MyEndpoint {
                 connection.close();
             }
         } catch (ClassNotFoundException e) {
-            HouSyncHouse response = getErrorResponse (e, -1);
+            HouSyncHouse response = getErrorResponseHouse(e, -1);
             houSyncHouses.clear();
             houSyncHouses.add(response);
         } catch (SQLException e) {
-            HouSyncHouse response = getErrorResponse (e, -2);
+            HouSyncHouse response = getErrorResponseHouse(e, -2);
             houSyncHouses.clear();
             houSyncHouses.add(response);
         }
@@ -367,34 +388,80 @@ public class MyEndpoint {
                 connection.close();
             }
         } catch (ClassNotFoundException e) {
-            response = getErrorResponse (e, -1);
+            response = getErrorResponseHouse(e, -1);
         } catch (SQLException e) {
-            response = getErrorResponse (e, -2);
+            response = getErrorResponseHouse(e, -2);
         }
 
         return response;
     }
 
-    @ApiMethod(name = "addUserToHouse")
-    public HouSyncHouse addUserToHouse(@Named("houseId") int houseId, @Named("user_id") int userId){
-        HouSyncHouse response = null;
+    @ApiMethod(name = "getUser")
+    public HouSyncUser getUser(@Named("userId") int userId){
+        HouSyncUser response;
+
+
+        try {
+            String url = getDBUrl(USER_DB);
+            Connection connection = DriverManager.getConnection(url);
+            try {
+                response = getUserData(userId, connection);
+            }finally {
+                connection.close();
+            }
+        } catch (ClassNotFoundException e) {
+            response = getErrorResponseUser(e, -1);
+        } catch (SQLException e) {
+            response = getErrorResponseUser(e, -2);
+        }
+
+        return response;
+    }
+
+    @ApiMethod(name = "addUserInHouse")
+    public HouSyncHouse addUserInHouse(@Named("houseId") int houseId, @Named("user_id") int userId){
+        HouSyncHouse response;
 
         try {
             String url = getDBUrl(HOUSE_DB);
             Connection connection = DriverManager.getConnection(url);
             try {
                 insertUserInHouse(houseId, userId, connection);
+                response = getHouseData(houseId, connection);
             }finally {
                 connection.close();
             }
         } catch (ClassNotFoundException e) {
-            response = getErrorResponse (e, -1);
+            response = getErrorResponseHouse(e, -1);
         } catch (SQLException e) {
-            response = getErrorResponse (e, -2);
+            response = getErrorResponseHouse(e, -2);
         }
 
         return response;
     }
+
+    @ApiMethod(name = "removeUserFromHouse")
+    public HouSyncHouse removeUserFromHouse(@Named("houseId") int houseId, @Named("user_id") int userId){
+        HouSyncHouse response;
+
+        try {
+            String url = getDBUrl(HOUSE_DB);
+            Connection connection = DriverManager.getConnection(url);
+            try {
+                removeUserFromHouse(houseId, userId, connection);
+                response = getHouseData(houseId, connection);
+            }finally {
+                connection.close();
+            }
+        } catch (ClassNotFoundException e) {
+            response = getErrorResponseHouse(e, -1);
+        } catch (SQLException e) {
+            response = getErrorResponseHouse(e, -2);
+        }
+
+        return response;
+    }
+
 
 
 
@@ -413,6 +480,30 @@ public class MyEndpoint {
 
         return url;
     }
+
+
+    private HouSyncUser getErrorResponseUser(Exception e, int errorCode) {
+        HouSyncUser response = new HouSyncUser();
+        StringWriter error = new StringWriter();
+
+        e.printStackTrace(new PrintWriter(error));
+        response.setUserName(error.toString());
+        response.setErrorCode(errorCode);
+
+        return response;
+    }
+
+    private HouSyncHouse getErrorResponseHouse(Exception e, int errorCode) {
+        HouSyncHouse response = new HouSyncHouse();
+        StringWriter error = new StringWriter();
+
+        e.printStackTrace(new PrintWriter(error));
+        response.setHouseName(error.toString());
+        response.setErrorCode(errorCode);
+
+        return response;
+    }
+
     
     private int createNewUserInDB(String socialUserId, Connection connection) throws SQLException{
         String statement = "INSERT INTO user (name) " +
@@ -456,7 +547,7 @@ public class MyEndpoint {
     private HouSyncUser getUserData(int userId, Connection connection) throws SQLException{
         HouSyncUser response = new HouSyncUser();
 
-        String statement = "SELECT name, email FROM user " +
+        String statement = "SELECT name, email, phone, snapshot FROM user " +
                 "WHERE id = ? " +
                 "LIMIT 1;";
         PreparedStatement stmt = connection.prepareStatement(statement);
@@ -464,8 +555,11 @@ public class MyEndpoint {
         ResultSet resultSet = stmt.executeQuery();
 
         if (resultSet.first()){
+            response.setUserId(userId);
             response.setUserName(resultSet.getString("name"));
             response.setEmail(resultSet.getString("email"));
+            response.setPhone(resultSet.getString("phone"));
+            response.setSnapshot(resultSet.getString("snapshot"));
         }else{
             response.setErrorCode(3);
         }
@@ -474,16 +568,6 @@ public class MyEndpoint {
         return response;
     }
 
-    private HouSyncHouse getErrorResponse(Exception e, int errorCode) {
-        HouSyncHouse response = new HouSyncHouse();
-        StringWriter error = new StringWriter();
-
-        e.printStackTrace(new PrintWriter(error));
-        response.setHouseName(error.toString());
-        response.setErrorCode(errorCode);
-
-        return response;
-    }
 
     private HouSyncHouse getHouseData(int houseId, Connection connection) throws SQLException{
         HouSyncHouse response = new HouSyncHouse(houseId);
@@ -505,6 +589,26 @@ public class MyEndpoint {
         return response;
     }
 
+    private List<HouSyncUser> getHouseUsers(int houseId, Connection connection) throws SQLException {
+        List<HouSyncUser> usersList = new ArrayList<>();
+
+        String statement = "SELECT id_user " +
+                "FROM house join user_house " +
+                "WHERE id = id_house " +
+                "AND id_house = ?";
+        PreparedStatement stmt = connection.prepareStatement(statement);
+        stmt.setInt(1, houseId);
+        ResultSet resultSet = stmt.executeQuery();
+
+        while (resultSet.next()){
+            int userId = resultSet.getInt("id_user");
+            HouSyncUser user = new HouSyncUser(userId);
+            usersList.add(user);
+        }
+
+        return usersList;
+    }
+
     private HouSyncHouse createHouse(String houseName, int adminId, String createTime, Connection connection) throws SQLException {
         String statement = "INSERT INTO house (name, id_admin, create_time) " +
                 "VALUES (?, ?, ?);";
@@ -523,8 +627,6 @@ public class MyEndpoint {
 
         resultSet.first();
         int houseId = resultSet.getInt("id");
-
-        insertUserInHouse(houseId, adminId, connection);
 
         return getHouseData(houseId, connection);
 
@@ -562,6 +664,17 @@ public class MyEndpoint {
         stmt.setInt(1, userId);
         stmt.setInt(2, houseId);
         stmt.execute();
+    }
+
+    private void removeUserFromHouse(int houseId, int userId, Connection connection)  throws SQLException {
+        String statement = "REMOVE FROM user_house " +
+                "WHERE id_user = ? " +
+                "AND  id_house = ?;";
+        PreparedStatement stmt = connection.prepareStatement(statement);
+        stmt.setInt(1, userId);
+        stmt.setInt(2, houseId);
+        stmt.execute();
+
     }
 
 }

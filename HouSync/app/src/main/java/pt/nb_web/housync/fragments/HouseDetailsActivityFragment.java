@@ -153,8 +153,6 @@ public class HouseDetailsActivityFragment extends Fragment {
         userHouseRecyclerAdapter = new UserHouseRecyclerAdapter(usersList);
 
         userHouseManagerRecyclerView.setAdapter(userHouseRecyclerAdapter);
-
-        Log.d(TAG, "Done");
     }
 
 

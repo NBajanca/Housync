@@ -14,6 +14,7 @@ import pt.nb_web.housync.service.sign_in.GoogleAccount;
 import pt.nb_web.housync.background.LogInAsyncTask;
 import pt.nb_web.housync.service.sign_in.SignInAccount;
 import pt.nb_web.housync.service.sign_in.UserLogIn;
+import pt.nb_web.housync.utils.ProgressDialogHelper;
 
 public class LogInActivity extends AppCompatActivity{
 
@@ -51,12 +52,16 @@ public class LogInActivity extends AppCompatActivity{
 
         if (requestCode == googleAccount.getRcSignIn()) {
             googleAccount.onLogInActivityResult(requestCode, resultCode, data);
-            if (googleAccount.getGoogleSignInAccount() != null)
+            if (googleAccount.getGoogleSignInAccount() != null) {
+                ProgressDialogHelper.show(this, getString(R.string.signing_in));
                 new LogInAsyncTask(this).execute((SignInAccount) googleAccount);
+            }
         }else{
             facebookAccount.onLogInActivityResult(requestCode, resultCode, data);
-            if (facebookAccount.getAccessToken() != null)
+            if (facebookAccount.getAccessToken() != null) {
+                ProgressDialogHelper.show(this, getString(R.string.signing_in));
                 new LogInAsyncTask(this).execute((SignInAccount) facebookAccount);
+            }
         }
     }
 
@@ -84,9 +89,11 @@ public class LogInActivity extends AppCompatActivity{
             Log.d("updateLoginState", "No valid Login");
             if(googleAccount.getGoogleSignInAccount() != null){
                 Log.d("updateLoginState", "Login in with Google");
+                ProgressDialogHelper.show(this, getString(R.string.signing_in));
                 new LogInAsyncTask(this).execute((SignInAccount) googleAccount);
             }else if(facebookAccount.getAccessToken() != null) {
                 Log.d("updateLoginState", "Login in with Facebook");
+                ProgressDialogHelper.show(this, getString(R.string.signing_in));
                 new LogInAsyncTask(this).execute((SignInAccount) facebookAccount);
             }
         }

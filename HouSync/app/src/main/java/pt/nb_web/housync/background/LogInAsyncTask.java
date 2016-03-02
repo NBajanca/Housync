@@ -1,5 +1,6 @@
 package pt.nb_web.housync.background;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -16,6 +17,7 @@ import pt.nb_web.housync.service.sign_in.FacebookAccount;
 import pt.nb_web.housync.service.sign_in.GoogleAccount;
 import pt.nb_web.housync.service.sign_in.SignInAccount;
 import pt.nb_web.housync.service.sign_in.UserLogIn;
+import pt.nb_web.housync.utils.ProgressDialogHelper;
 
 /**
  * Created by Nuno on 20/02/2016.
@@ -80,9 +82,10 @@ public class LogInAsyncTask extends AsyncTask<SignInAccount, Void, HouSyncUser> 
             UserLogIn userLogIn = UserLogIn.getInstance(context);
             userLogIn.setUserName(result.getUserName());
             userLogIn.setUserId(result.getUserId());
-        }else{
-            Toast.makeText(context, result.getUserName(), Toast.LENGTH_LONG).show();
+        }
 
+        if(!isCancelled()){
+            ProgressDialogHelper.hide();
         }
     }
 }

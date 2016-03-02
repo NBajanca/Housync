@@ -13,22 +13,75 @@
     tools:showIn="@layout/activity_edit_house">
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/view_edit_name">
-
-        <TextView
-            android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/warnings_view"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/edit_house_name"/>
+            android:orientation="vertical"></LinearLayout>
 
-        <EditText
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/edited_house_name"
-            android:maxLength="@integer/max_house_name"
-            android:inputType="textAutoComplete|textAutoCorrect"  />
+            android:id="@+id/view_edit_name">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_house_name"/>
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:id="@+id/edited_house_name"
+                android:maxLength="@integer/max_house_name"
+                android:inputType="textAutoComplete|textAutoCorrect"  />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:id="@+id/view_add_users"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_user_title"
+                    android:textSize="@dimen/text_title2"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_user_id"/>
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/added_user_id"
+                    android:maxLength="@integer/max_user_id"
+                    android:inputType="number"/>
+
+                <Button
+                    android:id="@+id/add_user_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_user_button"/>
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -124,6 +124,19 @@ public class HouseSQLiteRepository {
     }
 
     /**
+     * Gets the house from the DB using the Online Id
+     *
+     * @param houseId
+     * @return HouseCursor
+     */
+    public HouseCursor getOnlineHouse(int houseId) {
+        return new HouseCursor(
+                db.rawQuery("SELECT * FROM " + HouseEntry.HOUSE_TABLE_NAME
+                                +" WHERE " + HouseEntry.COLUMN_NAME_ID + " = ?",
+                        new String[]{Integer.toString(houseId)}));
+    }
+
+    /**
      * Returns all houses
      *
      * @return HouseCursor

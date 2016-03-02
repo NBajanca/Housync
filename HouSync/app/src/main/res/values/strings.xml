@@ -40,6 +40,13 @@
     <string name="save_edit_house_button">Save</string>
     <string name="discard_edit_house_button">Discard changes</string>
 
+        <!-- Users -->
+        <string name="add_user_id">ID:</string>
+        <string name="add_user_button">Add host</string>
+        <string name="add_user_title">Add a new Host</string>
+        <string name="invalid_user_id">The Id inserted is incorrect</string>
+        <string name="incorrect_user_id">The Id doesn\'t correspond to a User</string>
+
 
     <string name="action_settings">Settings</string>
     <string name="loading">Loading…</string>
@@ -88,7 +95,6 @@
     <string name="sync">Sync</string>
 
     <string name="fragment_no_house_title">Select a House</string>
-
 
 
 </resources>

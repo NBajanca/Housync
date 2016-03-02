@@ -1,5 +1,7 @@
 package pt.nb_web.housync.model;
 
+import com.example.nuno.myapplication.housync_backend.myApi.model.HouSyncUser;
+
 /**
  * Created by Nuno on 29/02/2016.
  */
@@ -12,6 +14,10 @@ public class User {
 
     public User(int userId) {
         this.userId = userId;
+    }
+
+    public User() {
+
     }
 
     public int getUserId() {
@@ -68,5 +74,15 @@ public class User {
     @Override
     public int hashCode() {
         return getUserId();
+    }
+
+    public static User getUserFromHouSyncUser(HouSyncUser houSyncUser) {
+        User user = new User(houSyncUser.getUserId());
+        user.setName(houSyncUser.getUserName());
+        user.setEmail(houSyncUser.getEmail());
+        user.setPhone(houSyncUser.getPhone());
+        user.setSnapshot(houSyncUser.getSnapshot());
+
+        return user;
     }
 }

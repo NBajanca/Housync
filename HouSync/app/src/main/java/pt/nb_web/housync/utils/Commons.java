@@ -4,9 +4,20 @@ package pt.nb_web.housync.utils;
  * Created by Nuno on 23/02/2016.
  */
 public class Commons {
+
+
     public static boolean DEBUG = true;
 
     public static final int NO_EXTRA = -404;
+
+    public static final int ONLINE_UPDATE = 101;
+    public static final int LOCAL_UPDATE = 102;
+
+    public static final int NO_INTERNET = -101;
+    public static final int NOT_SIGNED_IN = -102;
+    public static final int USER_NOT_FOUND = -103;
+    public static final int HOUSE_NOT_FOUND = -104;
+    public static final int ERROR_IN_API = -105;
 
     public static final String HOUSE_LOCAL_ID_PARAMETER = "house_local_id";
 

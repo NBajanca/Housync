@@ -99,12 +99,19 @@ public class HouseService {
     /**
      * Gets a house from the DB
      *
-     * @param houseLocalID
+     * @param houseLocalId
      * @return
      * @throws HouseNotFoundException
      */
-    public House getHouse(int houseLocalID) throws HouseNotFoundException {
-        HouseCursor cursor = repository.getHouse(houseLocalID);
+    public House getHouse(int houseLocalId) throws HouseNotFoundException {
+        HouseCursor cursor = repository.getHouse(houseLocalId);
+        if(cursor.moveToFirst()){
+            return cursor.getHouse();
+        }else throw new HouseNotFoundException();
+    }
+
+    public House getOnlineHouse(int houseId) throws HouseNotFoundException{
+        HouseCursor cursor = repository.getOnlineHouse(houseId);
         if(cursor.moveToFirst()){
             return cursor.getHouse();
         }else throw new HouseNotFoundException();
@@ -146,20 +153,9 @@ public class HouseService {
      * Updates a house that was already local and now is also online.
      * @param house
      */
-    public void createOnline (House house, Context context) {
+    public void createOnline (House house) {
         repository.update(house);
         Log.d(TAG, "House created online");
-
-        UserLogIn userLogIn = UserLogIn.getInstance(context);
-        try {
-            User admin = userLogIn.getUser();
-            insertUser(house.getHouseId(), admin);
-        } catch (UserNotSignInException e) {
-            Log.d(TAG, "User not SignIn in createOnline");
-            e.printStackTrace();
-        }
-
-
     }
 
     /**
@@ -169,9 +165,12 @@ public class HouseService {
      *
      * @param house
      */
-    public void updateName(House house) {
+    public void updateName(House house, int step) {
         repository.updateName(house);
-        if(house.getHouseId() > 0){
+
+        if (step == Commons.ONLINE_UPDATE){
+            repository.updateSnapshot(house.getHouseLocalId(), house.getSnapShot());
+        }else if(house.getHouseId() > 0){
             repository.insertUpdated(house.getHouseId(), HouseDBContract.HouseEntry.COLUMN_NAME_NAME);
         }
     }
@@ -197,7 +196,6 @@ public class HouseService {
         repository.insertUser(houseId, userId);
         repository.insertUserUpdated(houseId, userId, HouseDBContract.ACTION_ADDED);
 
-
     }
 
     /**
@@ -221,10 +219,6 @@ public class HouseService {
     public List<User> getUsers(int houseId){
         List<User> usersList = new ArrayList<>();
         HouseCursor cursor = repository.getUsers(houseId);
-
-        if (Commons.DEBUG) {
-            Log.d(TAG, "# users: " + Integer.toString(cursor.getCount()));
-        }
 
         while (cursor.moveToNext()) {
             usersList.add(cursor.getUser());
@@ -349,5 +343,13 @@ public class HouseService {
         cursor.close();
         return usersList;
 
+    }
+
+    public void updateHouseSnapshot(int houseLocalId, String snapshot){
+        repository.updateSnapshot(houseLocalId, snapshot);
+    }
+
+    public void updateHouseSnapshotUser(int houseLocalId, String snapshotUser){
+        repository.updateSnapshotUser(houseLocalId, snapshotUser);
     }
 }

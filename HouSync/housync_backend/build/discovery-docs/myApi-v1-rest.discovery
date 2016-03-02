@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/XhIXsH4rPQK0JpyQHwYeQsCbE-k\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/DKzNTkMFqMFUXgLncX5bUmsTybw\"",
  "discoveryVersion": "v1",
  "id": "myApi:v1",
  "name": "myApi",
@@ -129,6 +129,12 @@
      "type": "integer",
      "format": "int32"
     },
+    "phone": {
+     "type": "string"
+    },
+    "snapshot": {
+     "type": "string"
+    },
     "userId": {
      "type": "integer",
      "format": "int32"
@@ -137,12 +143,24 @@
      "type": "string"
     }
    }
+  },
+  "HouSyncUserCollection": {
+   "id": "HouSyncUserCollection",
+   "type": "object",
+   "properties": {
+    "items": {
+     "type": "array",
+     "items": {
+      "$ref": "HouSyncUser"
+     }
+    }
+   }
   }
  },
  "methods": {
-  "addUserToHouse": {
-   "id": "myApi.addUserToHouse",
-   "path": "addUserToHouse/{houseId}/{user_id}",
+  "addUserInHouse": {
+   "id": "myApi.addUserInHouse",
+   "path": "addUserInHouse/{houseId}/{user_id}",
    "httpMethod": "POST",
    "parameters": {
     "houseId": {
@@ -239,6 +257,79 @@
    },
    "parameterOrder": [
     "houseId"
+   ],
+   "response": {
+    "$ref": "HouSyncHouse"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "getHouseUsers": {
+   "id": "myApi.getHouseUsers",
+   "path": "housyncusercollection/{houseId}",
+   "httpMethod": "GET",
+   "parameters": {
+    "houseId": {
+     "type": "integer",
+     "required": true,
+     "format": "int32",
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "houseId"
+   ],
+   "response": {
+    "$ref": "HouSyncUserCollection"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "getUser": {
+   "id": "myApi.getUser",
+   "path": "housyncuser/{userId}",
+   "httpMethod": "GET",
+   "parameters": {
+    "userId": {
+     "type": "integer",
+     "required": true,
+     "format": "int32",
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "userId"
+   ],
+   "response": {
+    "$ref": "HouSyncUser"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "removeUserFromHouse": {
+   "id": "myApi.removeUserFromHouse",
+   "path": "userfromhouse/{houseId}/{user_id}",
+   "httpMethod": "DELETE",
+   "parameters": {
+    "houseId": {
+     "type": "integer",
+     "required": true,
+     "format": "int32",
+     "location": "path"
+    },
+    "user_id": {
+     "type": "integer",
+     "required": true,
+     "format": "int32",
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "houseId",
+    "user_id"
    ],
    "response": {
     "$ref": "HouSyncHouse"

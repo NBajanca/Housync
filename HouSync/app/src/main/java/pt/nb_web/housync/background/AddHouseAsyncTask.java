@@ -60,7 +60,7 @@ public class AddHouseAsyncTask extends AsyncTask<House, Void, Void> {
                 HouSyncHouse response = myApiService.createHouse(houseToAdd.getHouSyncHouseFromHouse(houseToAdd)).execute();
                 houseToAdd = House.getHouseFromHouSyncHouse(response);
                 houseToAdd.setHouseLocalId(houseLocalId);
-                houseService.createOnline(houseToAdd, context);
+                houseService.createOnline(houseToAdd);
                 return true;
             }
         }

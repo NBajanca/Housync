@@ -15,7 +15,6 @@ import pt.nb_web.housync.service.HouseService;
 public class UserLogIn {
     private final Context context;
     private SharedPreferences userSharedPref;
-    private HouseService houseService;
 
     private static UserLogIn instance;
 
@@ -29,7 +28,6 @@ public class UserLogIn {
         this.context = context;
         userSharedPref = context.getSharedPreferences(
                 context.getString(R.string.user_file_key), Context.MODE_PRIVATE);
-        houseService = HouseService.getInstance(context);
     }
 
     public boolean checkIfLogedIn(){
@@ -51,7 +49,6 @@ public class UserLogIn {
 
             User user = new User(getUserId());
             user.setName(userName);
-            houseService.addUser(user);
         }
     }
 
@@ -65,13 +62,11 @@ public class UserLogIn {
             editor.putInt(context.getString(R.string.houSyncUserId), userId);
             editor.commit();
 
-            houseService.addUser(new User(userId));
             Toast.makeText(context, "Signed In", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void clearUser(){
-        houseService.deleteUser(getUserId());
         SharedPreferences.Editor editor = userSharedPref.edit();
         editor.clear();
         editor.commit();
