@@ -22,6 +22,9 @@ public class HouseDBContract {
     public static final String DEFAULT = " DEFAULT";
     public static final String CURRENT_TIMESTAMP = " CURRENT_TIMESTAMP";
 
+    public static final String ACTION_ADDED = "added";
+    public static final String ACTION_DELETED = "deleted";
+
     public static final String COMMA_SEP = ",";
 
     private static final String SQL_CREATE_HOUSE_TABLE =
@@ -42,6 +45,16 @@ public class HouseDBContract {
                     + PRIMARY_KEY + " ("+HouseEntry.COLUMN_NAME_HOUSE_ID+COMMA_SEP
                     +HouseEntry.COLUMN_NAME_USER_ID+") )";
 
+    private static final String SQL_CREATE_USER_TABLE =
+            "CREATE TABLE IF NOT EXISTS "+ HouseEntry.USER_TABLE_NAME+" ("
+                    +HouseEntry.COLUMN_NAME_ID+INT_CHAR_TYPE+PRIMARY_KEY+NOT_NULL+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_NAME+VAR_CHAR_TYPE+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_EMAIL+VAR_CHAR_TYPE+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_SNAPSHOT+VAR_CHAR_TYPE+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_PHONE+VAR_CHAR_TYPE+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_LAST_SYNC+TIMESTAMP_CHAR_TYPE+DEFAULT+CURRENT_TIMESTAMP+NOT_NULL+" )";
+
+
     private static final String SQL_CREATE_DELETE_HOUSE_TABLE =
             "CREATE TABLE IF NOT EXISTS "+ HouseEntry.DELETE_HOUSE_TABLE_NAME+" ("
                     +HouseEntry.COLUMN_NAME_ID+INT_CHAR_TYPE+PRIMARY_KEY+NOT_NULL
@@ -53,6 +66,14 @@ public class HouseDBContract {
                     +HouseEntry.COLUMN_NAME_FIELD+VAR_CHAR_TYPE+NOT_NULL+COMMA_SEP
                     + PRIMARY_KEY + " ("+HouseEntry.COLUMN_NAME_ID+COMMA_SEP
                     +HouseEntry.COLUMN_NAME_FIELD+") )";
+
+    private static final String SQL_CREATE_USER_HOUSE_UPDATE_TABLE =
+            "CREATE TABLE IF NOT EXISTS "+ HouseEntry.USER_HOUSE_UPDATE_TABLE_NAME+" ("
+                    +HouseEntry.COLUMN_NAME_ID+INT_CHAR_TYPE+NOT_NULL+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_USER_ID+INT_CHAR_TYPE+NOT_NULL+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_ACTION+VAR_CHAR_TYPE+NOT_NULL+COMMA_SEP
+                    + PRIMARY_KEY + " ("+HouseEntry.COLUMN_NAME_ID+COMMA_SEP
+                    +HouseEntry.COLUMN_NAME_USER_ID+") )";
 
 
     public static SQLiteDatabase getWritableDatabase(Context context){
@@ -75,6 +96,10 @@ public class HouseDBContract {
         public static final String COLUMN_NAME_CREATE_TIME= "create_time";
         public static final String COLUMN_NAME_LAST_SYNC= "last_sync";
 
+        public static final String USER_TABLE_NAME = "user";
+        public static final String COLUMN_NAME_EMAIL = "email";
+        public static final String COLUMN_NAME_PHONE = "phone";
+
         public static final String USER_HOUSE_TABLE_NAME = "user_house";
         public static final String COLUMN_NAME_USER_ID = "user_id";
         public static final String COLUMN_NAME_HOUSE_ID = "house_id";
@@ -83,11 +108,12 @@ public class HouseDBContract {
 
         public static final String UPDATE_HOUSE_TABLE_NAME = "update_house";
         public static final String COLUMN_NAME_FIELD = "field";
+
+        public static final String USER_HOUSE_UPDATE_TABLE_NAME = "user_house_update";
+        public static final String COLUMN_NAME_ACTION = "action";
     }
 
     private static class HouseDBHelper extends SQLiteOpenHelper {
-
-
         public HouseDBHelper(Context context){
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
@@ -96,8 +122,10 @@ public class HouseDBContract {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(SQL_CREATE_HOUSE_TABLE);
             db.execSQL(SQL_CREATE_USER_HOUSE_TABLE);
+            db.execSQL(SQL_CREATE_USER_TABLE);
             db.execSQL(SQL_CREATE_DELETE_HOUSE_TABLE);
             db.execSQL(SQL_CREATE_UPDATE_HOUSE_TABLE);
+            db.execSQL(SQL_CREATE_USER_HOUSE_UPDATE_TABLE);
         }
 
         @Override

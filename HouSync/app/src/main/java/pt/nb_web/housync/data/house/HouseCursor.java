@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 
 import pt.nb_web.housync.model.House;
+import pt.nb_web.housync.model.User;
 
 /**
  * Created by Nuno on 21/02/2016.
@@ -67,10 +68,40 @@ public class HouseCursor extends CursorWrapper{
                         HouseEntry.COLUMN_NAME_LAST_SYNC));
     }
 
+    public String getEmail() {
+        return getString(
+                getColumnIndex(HouseDBContract.
+                        HouseEntry.COLUMN_NAME_EMAIL));
+    }
+
+    public String getPhone() {
+        return getString(
+                getColumnIndex(HouseDBContract.
+                        HouseEntry.COLUMN_NAME_PHONE));
+    }
+
     public String getField() {
         return getString(
                 getColumnIndex(HouseDBContract.
                         HouseEntry.COLUMN_NAME_FIELD));
+    }
+
+    public Integer getUserId() {
+        return getInt(
+                getColumnIndex(HouseDBContract.
+                        HouseEntry.COLUMN_NAME_USER_ID));
+    }
+
+    public String getAction() {
+        return getString(
+                getColumnIndex(HouseDBContract.
+                        HouseEntry.COLUMN_NAME_ACTION));
+    }
+
+    public int getHouseId() {
+        return getInt(
+                getColumnIndex(HouseDBContract.
+                        HouseEntry.COLUMN_NAME_HOUSE_ID));
     }
 
     public House getHouse(){
@@ -91,6 +122,22 @@ public class HouseCursor extends CursorWrapper{
         response.setAdminId(adminId);
         response.setCreateTime(createTime);
         response.setLastSync(lastSync);
+
+        return response;
+    }
+
+    public User getUser(){
+        int userId = getId();
+        String name = getName();
+        String email = getEmail();
+        String phone = getPhone();
+        String snapshot = getSnapshot();
+
+        User response = new User(userId);
+        response.setName(name);
+        response.setEmail(email);
+        response.setPhone(phone);
+        response.setSnapshot(snapshot);
 
         return response;
     }

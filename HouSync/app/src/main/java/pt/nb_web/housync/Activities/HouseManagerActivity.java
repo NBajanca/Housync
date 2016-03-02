@@ -124,7 +124,7 @@ public class HouseManagerActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        drawerHelper.updateNavHeader();
+        drawerHelper.updateNavHeader(getBaseContext());
 
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);

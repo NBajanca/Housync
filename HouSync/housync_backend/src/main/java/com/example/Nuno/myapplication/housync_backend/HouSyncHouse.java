@@ -1,5 +1,7 @@
 package com.example.Nuno.myapplication.housync_backend;
 
+import java.util.List;
+
 /**
  * Created by Nuno on 21/02/2016.
  */

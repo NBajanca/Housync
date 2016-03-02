@@ -72,7 +72,7 @@ public class LogInActivity extends AppCompatActivity{
     }
 
     private void updateLoginState(){
-        UserLogIn userLogIn = new UserLogIn(this);
+        UserLogIn userLogIn = UserLogIn.getInstance(this);
 
         if(userLogIn.checkIfLogedIn()){
             Log.d("updateLoginState", "Valid LogIn");

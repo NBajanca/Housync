@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +54,7 @@ public class HouseManagerActivityFragment extends Fragment {
 
     private void setupHouseManagerView(final Context context, View view) {
         houseService = HouseService.getInstance(context);
-        List<House> localHousesList = houseService.getAllItems();
+        List<House> localHousesList = houseService.getAllHouses();
         List<House> housesList = localHousesList;
 
         if (NetworkHelper.isOnline(context)){

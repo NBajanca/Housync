@@ -37,7 +37,7 @@ public class LogInAsyncTask extends AsyncTask<SignInAccount, Void, HouSyncUser> 
         signInAccount = params[0];
         if (signInAccount == null) return null;
 
-        UserLogIn userLogIn = new UserLogIn(context);
+        UserLogIn userLogIn = UserLogIn.getInstance(context);
 
         if(myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
@@ -77,7 +77,7 @@ public class LogInAsyncTask extends AsyncTask<SignInAccount, Void, HouSyncUser> 
         Log.d("LogInAsync", "Result code:" + result.getErrorCode());
 
         if (result != null && result.getErrorCode() == 0){
-            UserLogIn userLogIn = new UserLogIn(context);
+            UserLogIn userLogIn = UserLogIn.getInstance(context);
             userLogIn.setUserName(result.getUserName());
             userLogIn.setUserId(result.getUserId());
         }else{

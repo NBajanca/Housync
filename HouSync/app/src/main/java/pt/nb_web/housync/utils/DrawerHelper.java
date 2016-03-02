@@ -1,5 +1,6 @@
 package pt.nb_web.housync.utils;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -89,11 +90,11 @@ public class DrawerHelper implements
         return true;
     }
 
-    public void updateNavHeader(){
+    public void updateNavHeader(Context context){
         TextView userIdTextView = (TextView) headerView.findViewById(R.id.user_id);
         TextView userNameTextView = (TextView) headerView.findViewById(R.id.user_name);
 
-        UserLogIn userLogIn = new UserLogIn(activity.getBaseContext());
+        UserLogIn userLogIn = UserLogIn.getInstance(context);
         if(userLogIn.checkIfLogedIn()){
             userIdTextView.setText(Integer.toString(userLogIn.getUserId()));
             userNameTextView.setText(userLogIn.getUserName());

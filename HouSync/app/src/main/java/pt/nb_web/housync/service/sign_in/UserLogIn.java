@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import pt.nb_web.housync.R;
+import pt.nb_web.housync.exception.UserNotSignInException;
+import pt.nb_web.housync.model.User;
+import pt.nb_web.housync.service.HouseService;
 
 /**
  * Created by Nuno on 20/02/2016.
@@ -12,6 +15,7 @@ import pt.nb_web.housync.R;
 public class UserLogIn {
     private final Context context;
     private SharedPreferences userSharedPref;
+    private HouseService houseService;
 
     private static UserLogIn instance;
 
@@ -21,10 +25,11 @@ public class UserLogIn {
         return instance;
     }
 
-    public UserLogIn(Context context){
+    private UserLogIn(Context context){
         this.context = context;
         userSharedPref = context.getSharedPreferences(
                 context.getString(R.string.user_file_key), Context.MODE_PRIVATE);
+        houseService = HouseService.getInstance(context);
     }
 
     public boolean checkIfLogedIn(){
@@ -43,6 +48,10 @@ public class UserLogIn {
             SharedPreferences.Editor editor = userSharedPref.edit();
             editor.putString(context.getString(R.string.houSyncUserName), userName);
             editor.commit();
+
+            User user = new User(getUserId());
+            user.setName(userName);
+            houseService.addUser(user);
         }
     }
 
@@ -55,14 +64,29 @@ public class UserLogIn {
             SharedPreferences.Editor editor = userSharedPref.edit();
             editor.putInt(context.getString(R.string.houSyncUserId), userId);
             editor.commit();
+
+            houseService.addUser(new User(userId));
             Toast.makeText(context, "Signed In", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void clearUser(){
+        houseService.deleteUser(getUserId());
         SharedPreferences.Editor editor = userSharedPref.edit();
         editor.clear();
         editor.commit();
+
         Toast.makeText(context, "Signed Out", Toast.LENGTH_SHORT).show();
+    }
+
+    public User getUser() throws UserNotSignInException {
+        if (!checkIfLogedIn()) throw new UserNotSignInException();
+        int id = getUserId();
+        String name = getUserName();
+
+        User user = new User(id);
+        user.setName(name);
+
+        return user;
     }
 }

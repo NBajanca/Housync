@@ -204,7 +204,7 @@ public class UpdateHouseListAsyncTask extends AsyncTask<List<House>, Void, Void>
         }
 
         if (housesAdded != 0) {
-            List<House> housesList = houseService.getAllItems();
+            List<House> housesList = houseService.getAllHouses();
             houseRecyclerAdapter.updateList(housesList);
         }
 

@@ -1,12 +1,15 @@
 package pt.nb_web.housync.model;
 
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Nuno on 21/02/2016.
  */
 public class House extends HouSyncHouse {
     private int houseLocalId;
+    private List<Integer> usersIdList;
 
     public House(int localId, String name) {
         setHouseLocalId(localId);
@@ -35,8 +38,12 @@ public class House extends HouSyncHouse {
         this.houseLocalId = houseLocalId;
     }
 
-    public String getLocalIdString() {
-        return Integer.toString(getHouseLocalId());
+    public List<Integer> getUsersIdList() {
+        return usersIdList;
+    }
+
+    public void setUsersIdList(List<Integer> usersIdList) {
+        this.usersIdList = new ArrayList<>(usersIdList);
     }
 
     @Override
@@ -75,4 +82,6 @@ public class House extends HouSyncHouse {
         response.setCreateTime(house.getCreateTime());
         return response;
     }
+
+
 }

@@ -10,5 +10,7 @@
     <dimen name="login_margin">30dp</dimen>
     <dimen name="fragment_vertical_margin">16dp</dimen>
     <dimen name="fragment_horizontal_margin">16dp</dimen>
+    <dimen name="text_bigger">14sp</dimen>
+    <dimen name="text_title2">16sp</dimen>
 
 </resources>
