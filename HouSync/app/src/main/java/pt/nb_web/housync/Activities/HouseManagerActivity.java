@@ -90,12 +90,10 @@ public class HouseManagerActivity extends AppCompatActivity
             if (house != null){
                 Log.d("create_menu", "enter2");
                 getMenuInflater().inflate(R.menu.house_manager_tablet, menu);
-                menu.findItem(R.id.menu_house_selected).setTitle(getString(R.string.house_settings_menu_title, house.getHouseName()));
                 return true;
             }
         }
-        getMenuInflater().inflate(R.menu.house_manager, menu);
-        return true;
+        return false;
     }
 
     @Override
@@ -108,11 +106,11 @@ public class HouseManagerActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        }else if(id == R.id.action_update){
+        }else if(id == R.id.action_select){
             return true;
         }else if(id == R.id.action_edit){
             Intent intent = new Intent(this , EditHouseActivity.class);
-            intent.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, id);
+            intent.putExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, houseDetailsFragment.getHouseLocalId());
             startActivityForResult(intent, Commons.HOUSE_EDIT_ACTIVIY_REQUEST);
         }else if(id == R.id.action_delete){
             onHouseDeleted(houseDetailsFragment.getHouseLocalId());
@@ -157,9 +155,13 @@ public class HouseManagerActivity extends AppCompatActivity
                     else deleteHouse(houseLocalId);
                 }
 
-            } else if (requestCode == Commons.HOUSE_EDIT_ACTIVIY_REQUEST && resultCode == RESULT_OK) {
-                int result = data.getIntExtra(Commons.HOUSE_DETAILS_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
-                if (result == Commons.HOUSE_DETAILS_ACTIVIY_RESULT_DELETE) {
+            } else if (requestCode == Commons.HOUSE_EDIT_ACTIVIY_REQUEST) {
+                int result = data.getIntExtra(Commons.HOUSE_EDIT_ACTIVIY_PARAMETER, Commons.NO_EXTRA);
+                if (result == Commons.HOUSE_EDIT_ACTIVIY_RESULT_DELETE) {
+                    int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
+                    if (houseLocalId == Commons.NO_EXTRA) return;
+                    else deleteHouse(houseLocalId);
+                }else if (result == Commons.HOUSE_EDIT_ACTIVIY_RESULT_EDIT){
                     int houseLocalId = data.getIntExtra(Commons.HOUSE_LOCAL_ID_PARAMETER, Commons.NO_EXTRA);
                     if (houseLocalId == Commons.NO_EXTRA) return;
                     else updateHouse(houseLocalId);
@@ -260,6 +262,9 @@ public class HouseManagerActivity extends AppCompatActivity
                     ((RecyclerView)findViewById(R.id.house_manager_view)).getAdapter();
 
             houseRecyclerAdapter.updateItem(house);
+            if(mTwoPane){
+                houseDetailsFragment.updateHouse(houseLocalId);
+            }
         } catch (HouseNotFoundException e) {
             Log.d("HouseManager.updateH", "House not found: " + Integer.toString(houseLocalId));
             e.printStackTrace();

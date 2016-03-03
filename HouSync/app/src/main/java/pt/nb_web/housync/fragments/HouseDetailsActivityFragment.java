@@ -10,9 +10,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pt.nb_web.housync.R;
@@ -41,9 +45,9 @@ public class HouseDetailsActivityFragment extends Fragment {
     private static final String TAG ="HOUSE_DETAILS_FRAGMENT";
 
     private HouseService houseService;
-    private UserHouseRecyclerAdapter userHouseRecyclerAdapter;
-
     private House house;
+
+
     private Listener listener;
 
     @Override
@@ -89,7 +93,9 @@ public class HouseDetailsActivityFragment extends Fragment {
     }
 
     public int getHouseLocalId() {
-        if(getArguments() != null){
+        if (house != null) {
+            return house.getHouseLocalId();
+        }else if(getArguments() != null){
             return getArguments().getInt(Commons.HOUSE_LOCAL_ID_PARAMETER, 0);
         }
         return -1;
@@ -105,6 +111,7 @@ public class HouseDetailsActivityFragment extends Fragment {
 
     private void setViewFields(View view, final int houseLocalId) throws HouseNotFoundException {
         TextView nameTextView = (TextView) view.findViewById(R.id.house_fragment_house_name);
+        TextView lastSyncTextView = (TextView) view.findViewById(R.id.last_sync_text_view);
         HouseService houseService = HouseService.getInstance(this.getContext());
 
         house = houseService.getHouse(houseLocalId);
@@ -116,10 +123,25 @@ public class HouseDetailsActivityFragment extends Fragment {
         }else{
             nameTextView.setText(house.getHouseName());
         }
+        lastSyncTextView.setText(house.getLastSync());
 
-        if (house.getHouseId() != 0){
-            setupUserHouseManagerView(getContext(), view);
+        List<String> usersList = new ArrayList<>();
+        usersList.add(UserLogIn.getInstance(getContext()).getUserName());
+        for (User user: houseService.getUsers(house.getHouseId())) {
+            usersList.add(user.getName());
         }
+
+        ListView listView = (ListView) view.findViewById(R.id.house_details_list_hosts);
+        ArrayAdapter<String> adapter = (ArrayAdapter<String>) listView.getAdapter();
+        if (adapter != null){
+            adapter.clear();
+            adapter.addAll(usersList);
+            adapter.notifyDataSetChanged();
+        }else{
+            adapter = new ArrayAdapter<>(this.getContext(), R.layout.item_user_house, R.id.item_user_name, usersList);
+            listView.setAdapter(adapter);
+        }
+        setListViewHeightBasedOnChildren(listView);
     }
 
     public void updateHouse(int houseLocalId) {
@@ -131,28 +153,25 @@ public class HouseDetailsActivityFragment extends Fragment {
         }
     }
 
-    private void setupUserHouseManagerView(final Context context, View view) {
-        houseService = HouseService.getInstance(context);
-        List<User> usersList = houseService.getUsers(house.getHouseId());
+    private static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
 
-        if (Commons.DEBUG){
-            int nOfUsers = usersList.size();
-            Log.d("HouseDetailsFragment", "# of users: " + Integer.toString(nOfUsers));
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        int totalHeight = 0;
+        View view = null;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0)
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, AbsListView.LayoutParams.WRAP_CONTENT));
+
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
         }
-
-        setupRecycleView(usersList, view);
-    }
-
-    private void setupRecycleView(final List<User> usersList, View view){
-        RecyclerView userHouseManagerRecyclerView = (RecyclerView) view.findViewById(R.id.users_house_manager_view);
-        userHouseManagerRecyclerView.setHasFixedSize(true);
-
-        LinearLayoutManager llm = new LinearLayoutManager(getContext());
-
-        userHouseManagerRecyclerView.setLayoutManager(llm);
-        userHouseRecyclerAdapter = new UserHouseRecyclerAdapter(usersList);
-
-        userHouseManagerRecyclerView.setAdapter(userHouseRecyclerAdapter);
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
     }
 
 

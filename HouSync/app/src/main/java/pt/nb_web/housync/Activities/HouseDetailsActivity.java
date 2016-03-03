@@ -61,7 +61,7 @@ public class HouseDetailsActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if(id == R.id.action_update){
+        if(id == R.id.action_select){
             return true;
         }else if(id == R.id.action_edit){
             Intent intent = new Intent(this , EditHouseActivity.class);

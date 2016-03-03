@@ -15,6 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/action_buttons"
         android:orientation="vertical">
         <LinearLayout
             android:id="@+id/warnings_view"
@@ -57,10 +58,10 @@
                     android:text="@string/add_user_title"
                     android:textSize="@dimen/text_title2"/>
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:paddingTop="10dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -80,32 +81,60 @@
                     android:layout_height="wrap_content"
                     android:text="@string/add_user_button"/>
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/remove_user_title"
+                    android:textSize="@dimen/text_title2"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/users_edit_house_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"/>
+            </LinearLayout>
+
 
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@id/action_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true">
+        android:layout_alignParentLeft="true"
+        style="?android:attr/buttonBarStyle">
 
         <Button
             android:id="@+id/discard_edit_house_button"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="@string/discard_edit_house_button"/>
+            android:text="@string/discard_edit_house_button"
+            style="?android:attr/buttonBarButtonStyle"/>
+
+        <LinearLayout
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/darker_gray"></LinearLayout>
 
         <Button
             android:id="@+id/save_edit_house_button"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="@string/save_edit_house_button"/>
+            android:text="@string/save_edit_house_button"
+            style="?android:attr/buttonBarButtonStyle"/>
 
 
     </LinearLayout>

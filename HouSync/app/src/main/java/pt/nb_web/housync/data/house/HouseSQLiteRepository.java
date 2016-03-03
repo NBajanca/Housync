@@ -278,7 +278,7 @@ public class HouseSQLiteRepository {
      */
     public void deleteUser (int houseId, int userID){
         db.execSQL("DELETE FROM " + HouseEntry.USER_HOUSE_TABLE_NAME + " WHERE "
-                        + HouseEntry.COLUMN_NAME_HOUSE_ID +" = ? "+COMMA_SEP
+                        + HouseEntry.COLUMN_NAME_HOUSE_ID +" = ? AND "
                         +HouseEntry.COLUMN_NAME_USER_ID+" = ? ",
                 new Object[]{houseId, userID});
     }

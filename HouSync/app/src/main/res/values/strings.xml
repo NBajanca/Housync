@@ -90,11 +90,15 @@
 
     <string name="manage_sign_in">Manage SignIn</string>
     <string name="no_login">Not Loged In</string>
-    <string name="last_sync">Last sync: </string>
+    <string name="last_sync">Last sync</string>
     <string name="never_sync">Never</string>
     <string name="sync">Sync</string>
 
     <string name="fragment_no_house_title">Select a House</string>
+    <string name="remove_user_title">Remove a Host</string>
+    <string name="repeated_user_id">This user is already a Host</string>
+    <string name="self_user_id">You are already a Host</string>
+    <string name="action_select_house">Select</string>
 
 
 </resources>

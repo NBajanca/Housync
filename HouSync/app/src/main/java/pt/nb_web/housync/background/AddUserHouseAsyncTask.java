@@ -3,6 +3,7 @@ package pt.nb_web.housync.background;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 
 import com.example.nuno.myapplication.housync_backend.myApi.MyApi;
@@ -13,7 +14,10 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 
 import java.io.IOException;
 
+import pt.nb_web.housync.R;
 import pt.nb_web.housync.activities.EditHouseActivity;
+import pt.nb_web.housync.adapter.HouseRecyclerAdapter;
+import pt.nb_web.housync.adapter.UserHouseRecyclerAdapter;
 import pt.nb_web.housync.exception.HouseNotFoundException;
 import pt.nb_web.housync.exception.UserNotFoundException;
 import pt.nb_web.housync.model.House;
@@ -114,6 +118,11 @@ public class AddUserHouseAsyncTask extends AsyncTask<Pair<Integer, Integer>, Voi
             }else{
                 houseService.insertUser(result.getHouseId(), localUser);
                 houseService.setUserUpdated(result, localUser.getUserId());
+                activityInstance.usersAdded.add(localUser.getUserId());
+
+                UserHouseRecyclerAdapter userHouseRecyclerAdapter = (UserHouseRecyclerAdapter)
+                        ((RecyclerView) activityInstance.findViewById(R.id.users_edit_house_view)).getAdapter();
+                userHouseRecyclerAdapter.addItem(localUser);
             }
         }
         ProgressDialogHelper.hide();

@@ -667,7 +667,7 @@ public class MyEndpoint {
     }
 
     private void removeUserFromHouse(int houseId, int userId, Connection connection)  throws SQLException {
-        String statement = "REMOVE FROM user_house " +
+        String statement = "DELETE FROM user_house " +
                 "WHERE id_user = ? " +
                 "AND  id_house = ?;";
         PreparedStatement stmt = connection.prepareStatement(statement);

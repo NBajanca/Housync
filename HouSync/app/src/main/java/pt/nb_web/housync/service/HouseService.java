@@ -195,8 +195,20 @@ public class HouseService {
 
         repository.insertUser(houseId, userId);
         repository.insertUserUpdated(houseId, userId, HouseDBContract.ACTION_ADDED);
-
     }
+
+    public void insertUserOnline(int houseId, User user){
+        int userId = user.getUserId();
+        try {
+            getUser(userId);
+        } catch (UserNotFoundException e) {
+            addUser(user);
+        }
+
+        repository.insertUser(houseId, userId);
+    }
+
+
 
     /**
      * Deletes a user from the local DB
@@ -208,6 +220,10 @@ public class HouseService {
     public void deleteUser(int houseId,int userId){
         repository.deleteUser(houseId, userId);
         repository.insertUserUpdated(houseId, userId, HouseDBContract.ACTION_DELETED);
+    }
+
+    public void deleteUserOnline(int houseId,int userId){
+        repository.deleteUser(houseId, userId);
     }
 
     /**
@@ -307,7 +323,7 @@ public class HouseService {
         HouseCursor cursor = repository.getAllUsersUpdated();
 
         while (cursor.moveToNext()) {
-            if (action == cursor.getAction())
+            if (action.equals(cursor.getAction()))
                 updatedUsers.add(new Pair<Integer, Integer>(cursor.getId(), cursor.getUserId()));
         }
 
